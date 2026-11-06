@@ -24,8 +24,17 @@ public class KeyboardButton {
     @JsonProperty("TEXT")
     private String text;
 
+    @JsonProperty("TYPE")
+    private String type;
+
     @JsonProperty("LINK")
     private String link;
+
+    @JsonProperty("ACTION")
+    private String action;
+
+    @JsonProperty("ACTION_VALUE")
+    private String actionValue;
 
     @JsonProperty("COMMAND")
     private String command;
@@ -33,11 +42,20 @@ public class KeyboardButton {
     @JsonProperty("COMMAND_PARAMS")
     private String commandParams;
 
-    @JsonProperty("ACTION")
-    private String action;
+    @JsonProperty("BLOCK")
+    private String block;
 
-    @JsonProperty("ACTION_VALUE")
-    private String actionValue;
+    @JsonProperty("DISABLED")
+    private String disabled;
+
+    @JsonProperty("CONTEXT")
+    private String context;
+
+    @JsonProperty("DISPLAY")
+    private String display;
+
+    @JsonProperty("WIDTH")
+    private Integer width;
 
     @JsonProperty("BG_COLOR")
     private String bgColor;
@@ -48,17 +66,11 @@ public class KeyboardButton {
     @JsonProperty("TEXT_COLOR")
     private String textColor;
 
-    @JsonProperty("DISPLAY")
-    private String display;
+    @JsonProperty("OFF_BG_COLOR")
+    private String offBgColor;
 
-    @JsonProperty("DISABLED")
-    private String disabled;
-
-    @JsonProperty("BLOCK")
-    private String block;
-
-    @JsonProperty("WAIT")
-    private String wait;
+    @JsonProperty("OFF_TEXT_COLOR")
+    private String offTextColor;
 
     public static KeyboardButton link(String text, String url) {
         return KeyboardButton.builder()
@@ -96,5 +108,11 @@ public class KeyboardButton {
 
     public static KeyboardButton send(String text, String textToSend) {
         return action(text, "SEND", textToSend);
+    }
+
+    public static KeyboardButton newLine() {
+        return KeyboardButton.builder()
+                .type("NEWLINE")
+                .build();
     }
 }

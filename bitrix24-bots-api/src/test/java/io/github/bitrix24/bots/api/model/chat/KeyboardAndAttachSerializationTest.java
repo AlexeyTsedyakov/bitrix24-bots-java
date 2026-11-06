@@ -16,11 +16,22 @@ class KeyboardAndAttachSerializationTest {
     void testKeyboardSerialization() {
         Keyboard keyboard = Keyboard.of(
                 KeyboardButton.link("Bitrix24 Docs", "https://apidocs.bitrix24.ru"),
+                KeyboardButton.newLine(),
                 KeyboardButton.builder()
                         .text("Trigger Command")
+                        .type("BUTTON")
                         .command("help")
                         .commandParams("full")
+                        .block("Y")
+                        .disabled("N")
+                        .context("ALL")
+                        .display("LINE")
+                        .width(200)
+                        .bgColor("#29619b")
                         .bgColorToken("primary")
+                        .textColor("#ffffff")
+                        .offBgColor("#cccccc")
+                        .offTextColor("#666666")
                         .build(),
                 KeyboardButton.put("Put Text", "/help"),
                 KeyboardButton.send("Send Text", "I need assistance")
@@ -30,12 +41,28 @@ class KeyboardAndAttachSerializationTest {
 
         assertThat(json).contains("\"TEXT\":\"Bitrix24 Docs\"");
         assertThat(json).contains("\"LINK\":\"https://apidocs.bitrix24.ru\"");
+        assertThat(json).contains("\"TYPE\":\"NEWLINE\"");
+        assertThat(json).contains("\"TYPE\":\"BUTTON\"");
         assertThat(json).contains("\"COMMAND\":\"help\"");
         assertThat(json).contains("\"COMMAND_PARAMS\":\"full\"");
+        assertThat(json).contains("\"BLOCK\":\"Y\"");
+        assertThat(json).contains("\"DISABLED\":\"N\"");
+        assertThat(json).contains("\"CONTEXT\":\"ALL\"");
+        assertThat(json).contains("\"DISPLAY\":\"LINE\"");
+        assertThat(json).contains("\"WIDTH\":200");
+        assertThat(json).contains("\"BG_COLOR\":\"#29619b\"");
         assertThat(json).contains("\"BG_COLOR_TOKEN\":\"primary\"");
+        assertThat(json).contains("\"TEXT_COLOR\":\"#ffffff\"");
+        assertThat(json).contains("\"OFF_BG_COLOR\":\"#cccccc\"");
+        assertThat(json).contains("\"OFF_TEXT_COLOR\":\"#666666\"");
         assertThat(json).contains("\"ACTION\":\"PUT\"");
         assertThat(json).contains("\"ACTION_VALUE\":\"/help\"");
         assertThat(json).contains("\"ACTION\":\"SEND\"");
+
+        KeyboardButton button = keyboard.getButtons().get(2);
+        String buttonJson = BitrixJsonMapper.toJson(button);
+        KeyboardButton deserializedButton = BitrixJsonMapper.fromJson(buttonJson, KeyboardButton.class);
+        assertThat(deserializedButton).isEqualTo(button);
     }
 
     @Test
