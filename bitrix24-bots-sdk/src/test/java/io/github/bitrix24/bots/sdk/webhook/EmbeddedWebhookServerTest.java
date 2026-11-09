@@ -1,7 +1,6 @@
 package io.github.bitrix24.bots.sdk.webhook;
 
 import io.github.bitrix24.bots.api.model.event.Event;
-import io.github.bitrix24.bots.sdk.config.BotConfig;
 import io.github.bitrix24.bots.sdk.config.WebhookConfig;
 import io.github.bitrix24.bots.sdk.dispatcher.BotEventDispatcher;
 import org.junit.jupiter.api.AfterEach;
@@ -32,16 +31,16 @@ class EmbeddedWebhookServerTest {
                 .connectTimeout(Duration.ofSeconds(3))
                 .build();
 
-        BotConfig botConfig = BotConfig.builder()
-                .applicationToken("test_secret_app_token")
-                .build();
-
-        BotEventDispatcher dispatcher = new BotEventDispatcher(botConfig, receivedEvents::add);
-
         WebhookConfig webhookConfig = WebhookConfig.builder()
                 .host("127.0.0.1")
                 .port(0) // allocate ephemeral free port
                 .path("/webhook/b24")
+                .applicationToken("test_secret_app_token")
+                .build();
+
+        BotEventDispatcher dispatcher = BotEventDispatcher.builder()
+                .webhookConfig(webhookConfig)
+                .listener(receivedEvents::add)
                 .build();
 
         server = new EmbeddedWebhookServer(webhookConfig, dispatcher);

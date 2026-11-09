@@ -4,6 +4,7 @@ import io.github.bitrix24.bots.api.json.BitrixJsonMapper;
 import io.github.bitrix24.bots.api.model.event.Event;
 import io.github.bitrix24.bots.api.model.event.EventType;
 import io.github.bitrix24.bots.sdk.config.BotConfig;
+import io.github.bitrix24.bots.sdk.config.WebhookConfig;
 import io.github.bitrix24.bots.sdk.listener.BotEventListener;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,9 @@ class BotEventDispatcherTest {
     @DisplayName("Dispatches all imbot.v2 event types when default configuration is used")
     void testDispatchAllEventTypesByDefault() {
         List<Event> received = new ArrayList<>();
-        BotEventDispatcher dispatcher = new BotEventDispatcher(BotConfig.builder().build(), received::add);
+        BotEventDispatcher dispatcher = BotEventDispatcher.builder()
+                .listener(received::add)
+                .build();
 
         EventType[] types = {
                 EventType.ONIMBOTV2MESSAGEADD,
@@ -55,7 +58,10 @@ class BotEventDispatcherTest {
         BotConfig config = BotConfig.builder()
                 .allowedEvents(EnumSet.of(EventType.ONIMBOTV2MESSAGEADD, EventType.ONIMBOTV2COMMANDADD))
                 .build();
-        BotEventDispatcher dispatcher = new BotEventDispatcher(config, received::add);
+        BotEventDispatcher dispatcher = BotEventDispatcher.builder()
+                .botConfig(config)
+                .listener(received::add)
+                .build();
 
         boolean messageDispatched = dispatcher.dispatch(Event.builder().type(EventType.ONIMBOTV2MESSAGEADD).build());
         boolean commandDispatched = dispatcher.dispatch(Event.builder().type(EventType.ONIMBOTV2COMMANDADD).build());
@@ -76,7 +82,9 @@ class BotEventDispatcherTest {
     @DisplayName("Dispatches Event from polling JSON and maps fields properly")
     void testDispatchPolledEvent() {
         List<Event> received = new ArrayList<>();
-        BotEventDispatcher dispatcher = new BotEventDispatcher(BotConfig.builder().build(), received::add);
+        BotEventDispatcher dispatcher = BotEventDispatcher.builder()
+                .listener(received::add)
+                .build();
 
         String eventJson = """
                 {
@@ -123,10 +131,13 @@ class BotEventDispatcherTest {
     @DisplayName("Dispatches Webhook JSON payload and verifies application token")
     void testDispatchWebhookJsonSuccess() {
         List<Event> received = new ArrayList<>();
-        BotConfig config = BotConfig.builder()
+        WebhookConfig webhookConfig = WebhookConfig.builder()
                 .applicationToken("valid_secret_token_123")
                 .build();
-        BotEventDispatcher dispatcher = new BotEventDispatcher(config, received::add);
+        BotEventDispatcher dispatcher = BotEventDispatcher.builder()
+                .webhookConfig(webhookConfig)
+                .listener(received::add)
+                .build();
 
         String webhookJson = """
                 {
@@ -172,10 +183,12 @@ class BotEventDispatcherTest {
     @Test
     @DisplayName("Rejects Webhook JSON when application token does not match")
     void testDispatchWebhookJsonInvalidToken() {
-        BotConfig config = BotConfig.builder()
+        WebhookConfig webhookConfig = WebhookConfig.builder()
                 .applicationToken("expected_token")
                 .build();
-        BotEventDispatcher dispatcher = new BotEventDispatcher(config);
+        BotEventDispatcher dispatcher = BotEventDispatcher.builder()
+                .webhookConfig(webhookConfig)
+                .build();
 
         String webhookJson = """
                 {
@@ -197,10 +210,13 @@ class BotEventDispatcherTest {
     @DisplayName("Dispatches Webhook urlencoded form format from PHP http_build_query")
     void testDispatchWebhookForm() {
         List<Event> received = new ArrayList<>();
-        BotConfig config = BotConfig.builder()
+        WebhookConfig webhookConfig = WebhookConfig.builder()
                 .applicationToken("form_secret_token")
                 .build();
-        BotEventDispatcher dispatcher = new BotEventDispatcher(config, received::add);
+        BotEventDispatcher dispatcher = BotEventDispatcher.builder()
+                .webhookConfig(webhookConfig)
+                .listener(received::add)
+                .build();
 
         String formUrlEncoded = "event=ONIMBOTV2MESSAGEADD"
                 + "&ts=1736937000"
@@ -278,7 +294,9 @@ class BotEventDispatcherTest {
             }
         };
 
-        BotEventDispatcher dispatcher = new BotEventDispatcher(BotConfig.builder().build(), failingListener);
+        BotEventDispatcher dispatcher = BotEventDispatcher.builder()
+                .listener(failingListener)
+                .build();
 
         // Dispatch must not throw
         boolean dispatched = dispatcher.dispatch(Event.builder().type(EventType.ONIMBOTV2MESSAGEADD).build());

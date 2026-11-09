@@ -130,8 +130,6 @@ public class PollingBotRunner implements AutoCloseable {
                 .offset(currentOffset)
                 .limit(config.getLimit())
                 .withUserEvents(config.isWithUserEvents())
-                .botId(config.getBotId())
-                .botToken(config.getBotToken())
                 .build();
 
         BitrixResponse<EventGetResult> response = client.event().get(request);

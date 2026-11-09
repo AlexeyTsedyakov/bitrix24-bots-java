@@ -9,7 +9,6 @@ import io.github.bitrix24.bots.api.model.event.Event;
 import io.github.bitrix24.bots.api.model.event.EventGetRequest;
 import io.github.bitrix24.bots.api.model.event.EventGetResult;
 import io.github.bitrix24.bots.api.model.event.EventType;
-import io.github.bitrix24.bots.sdk.config.BotConfig;
 import io.github.bitrix24.bots.sdk.config.PollingConfig;
 import io.github.bitrix24.bots.sdk.dispatcher.BotEventDispatcher;
 import io.github.bitrix24.bots.sdk.listener.BotEventListener;
@@ -39,7 +38,9 @@ class PollingBotRunnerTest {
         StubBitrixApiClient client = new StubBitrixApiClient(eventApi);
 
         List<Event> received = new ArrayList<>();
-        BotEventDispatcher dispatcher = new BotEventDispatcher(BotConfig.builder().build(), received::add);
+        BotEventDispatcher dispatcher = BotEventDispatcher.builder()
+                .listener(received::add)
+                .build();
 
         PollingConfig pollingConfig = PollingConfig.builder()
                 .initialOffset(100L)
@@ -133,7 +134,9 @@ class PollingBotRunnerTest {
             eventsReceivedLatch.countDown();
         };
 
-        BotEventDispatcher dispatcher = new BotEventDispatcher(BotConfig.builder().build(), listener);
+        BotEventDispatcher dispatcher = BotEventDispatcher.builder()
+                .listener(listener)
+                .build();
 
         // Enqueue batch 1
         eventApi.queueResponse(BitrixResponse.ok(EventGetResult.builder()
@@ -202,7 +205,9 @@ class PollingBotRunnerTest {
             }
         };
 
-        BotEventDispatcher dispatcher = new BotEventDispatcher(BotConfig.builder().build(), listener);
+        BotEventDispatcher dispatcher = BotEventDispatcher.builder()
+                .listener(listener)
+                .build();
 
         // Queue error response
         eventApi.queueResponse(BitrixResponse.error("QUERY_LIMIT_EXCEEDED", "Too many requests"));
@@ -240,10 +245,12 @@ class PollingBotRunnerTest {
                 .hasMore(false)
                 .build()));
 
-        BotEventDispatcher dispatcher = new BotEventDispatcher(BotConfig.builder().build(), ev -> {
-            isDaemonThread.set(Thread.currentThread().isDaemon());
-            pollStarted.countDown();
-        });
+        BotEventDispatcher dispatcher = BotEventDispatcher.builder()
+                .listener(ev -> {
+                    isDaemonThread.set(Thread.currentThread().isDaemon());
+                    pollStarted.countDown();
+                })
+                .build();
 
         PollingConfig config = PollingConfig.builder().intervalMs(100L).build();
         PollingBotRunner runner = new PollingBotRunner(client, dispatcher, config);

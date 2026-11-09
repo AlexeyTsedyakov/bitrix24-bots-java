@@ -17,8 +17,8 @@ import io.github.bitrix24.bots.api.model.common.batch.BatchRequest;
 import io.github.bitrix24.bots.api.model.common.batch.BatchResult;
 import io.github.bitrix24.bots.api.model.event.Event;
 import io.github.bitrix24.bots.api.model.event.EventGetResult;
-import io.github.bitrix24.bots.sdk.config.BotConfig;
 import io.github.bitrix24.bots.sdk.config.PollingConfig;
+import io.github.bitrix24.bots.sdk.config.WebhookConfig;
 import io.github.bitrix24.bots.sdk.polling.PollingBotRunner;
 import io.github.bitrix24.bots.sdk.webhook.WebhookHandler;
 import org.junit.jupiter.api.DisplayName;
@@ -67,9 +67,12 @@ class BitrixBotIntegrationTest {
         assertThat(commandId).isEqualTo(888L);
 
         // 3. Assemble BitrixBot facade
-        BotConfig botConfig = BotConfig.builder()
+        mockClient.config = BitrixApiConfig.builder()
                 .botId(botId)
                 .botToken("secret_bot_token_123")
+                .build();
+
+        WebhookConfig webhookConfig = WebhookConfig.builder()
                 .applicationToken("app_token_valid")
                 .build();
 
@@ -78,7 +81,7 @@ class BitrixBotIntegrationTest {
 
         BitrixBot bot = BitrixBot.builder()
                 .client(mockClient)
-                .botConfig(botConfig)
+                .webhookConfig(webhookConfig)
                 .onEvent(event -> {
                     processedEvents.add(event);
                     if (event.isCommand()) {
@@ -150,14 +153,16 @@ class BitrixBotIntegrationTest {
     @Test
     @DisplayName("End-to-end scenario: polling mode cycle with message echoing")
     void testEndToEndPollingFlow() {
-        MockBitrixApiClient mockClient = new MockBitrixApiClient();
+        MockBitrixApiClient mockClient = new MockBitrixApiClient(BitrixApiConfig.builder()
+                .botId(500L)
+                .botToken("polling_tok")
+                .build());
 
         List<Event> polledEvents = new CopyOnWriteArrayList<>();
         List<String> repliesSent = new CopyOnWriteArrayList<>();
 
         BitrixBot bot = BitrixBot.builder()
                 .client(mockClient)
-                .botConfig(BotConfig.builder().botId(500L).botToken("polling_tok").build())
                 .pollingConfig(PollingConfig.builder().initialOffset(10L).build())
                 .onEvent(event -> {
                     polledEvents.add(event);
@@ -218,12 +223,21 @@ class BitrixBotIntegrationTest {
     // --- Mock Client ---
 
     private static class MockBitrixApiClient implements BitrixApiClient {
+        BitrixApiConfig config;
         final List<CommandAnswerRequest> recordedAnswers = new ArrayList<>();
         final List<SendMessageRequest> recordedSentMessages = new ArrayList<>();
         final List<EventGetResult> queuedEvents = new ArrayList<>();
         final AtomicLong messageIdGen = new AtomicLong(1000L);
 
-        @Override public BitrixApiConfig getConfig() { return null; }
+        MockBitrixApiClient() {
+            this(null);
+        }
+
+        MockBitrixApiClient(BitrixApiConfig config) {
+            this.config = config;
+        }
+
+        @Override public BitrixApiConfig getConfig() { return config; }
         @Override public BitrixHttpClient getHttpClient() { return null; }
 
         @Override

@@ -37,17 +37,11 @@ class BotConfigTest {
     void testCustomAllowedEvents() {
         BotConfig config = BotConfig.builder()
                 .allowedEvents(EnumSet.of(EventType.ONIMBOTV2MESSAGEADD))
-                .applicationToken("app_token_secret")
-                .botToken("bot_token_secret")
-                .botId(123L)
                 .botCode("my_bot")
                 .build();
 
         assertThat(config.isAllowed(EventType.ONIMBOTV2MESSAGEADD)).isTrue();
         assertThat(config.isAllowed(EventType.ONIMBOTV2COMMANDADD)).isFalse();
-        assertThat(config.getApplicationToken()).isEqualTo("app_token_secret");
-        assertThat(config.getBotToken()).isEqualTo("bot_token_secret");
-        assertThat(config.getBotId()).isEqualTo(123L);
         assertThat(config.getBotCode()).isEqualTo("my_bot");
     }
 

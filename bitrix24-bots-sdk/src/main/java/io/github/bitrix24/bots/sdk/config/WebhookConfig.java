@@ -41,8 +41,7 @@ public class WebhookConfig {
     private int backlog = 50;
 
     /**
-     * Secret application token to verify incoming Bitrix24 webhook notifications.
-     * If specified, overrides {@link BotConfig#getApplicationToken()}.
+     * Secret application token assigned by Bitrix24 to verify incoming webhook notifications.
      */
     @ToString.Exclude
     private String applicationToken;

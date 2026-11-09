@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 /**
  * Configuration for connecting to Bitrix24 REST API.
  * Supports authentication via inbound webhook URL or OAuth 2.0 access token,
- * as well as bot-specific credentials (botId, botToken, applicationToken).
+ * as well as bot-specific credentials (botId, botToken).
  */
 @Getter
 @EqualsAndHashCode
@@ -40,12 +40,6 @@ public class BitrixApiConfig {
      * Secret bot token assigned during registration or required for imbot.v2 methods.
      */
     private String botToken;
-
-    /**
-     * Application token (auth.application_token) sent by Bitrix24 in events and webhooks
-     * to verify the authenticity of requests.
-     */
-    private String applicationToken;
 
     /**
      * OAuth 2.0 access token (optional, when OAuth authorization is used instead of webhook).
@@ -187,7 +181,6 @@ public class BitrixApiConfig {
                 "baseUrl=" + getMaskedBaseUrl() +
                 ", botId=" + botId +
                 ", botToken=" + (botToken != null ? "***" : "null") +
-                ", applicationToken=" + (applicationToken != null ? "***" : "null") +
                 ", oauthToken=" + (oauthToken != null ? "***" : "null") +
                 ")";
     }

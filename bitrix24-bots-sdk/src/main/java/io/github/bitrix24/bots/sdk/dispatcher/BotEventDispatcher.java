@@ -6,6 +6,7 @@ import io.github.bitrix24.bots.api.model.event.Event;
 import io.github.bitrix24.bots.api.model.event.EventData;
 import io.github.bitrix24.bots.api.model.event.EventType;
 import io.github.bitrix24.bots.sdk.config.BotConfig;
+import io.github.bitrix24.bots.sdk.config.WebhookConfig;
 import io.github.bitrix24.bots.sdk.listener.BotEventListener;
 import lombok.extern.slf4j.Slf4j;
 import tools.jackson.core.JacksonException;
@@ -22,7 +23,8 @@ import java.util.regex.Pattern;
 
 /**
  * Dispatches Bitrix24 bot events (from polling or webhooks) to registered {@link BotEventListener}s.
- * Performs application token verification, event filtering by {@link BotConfig#getAllowedEvents()},
+ * Performs webhook application token verification ({@link WebhookConfig#getApplicationToken()}),
+ * event filtering by {@link BotConfig#getAllowedEvents()},
  * safe payload mapping, and protected exception handling.
  */
 @Slf4j
@@ -31,48 +33,33 @@ public class BotEventDispatcher {
     private static final Pattern FORM_KEY_PATTERN = Pattern.compile("([^^\\[\\]]+)|\\[([^\\[\\]]*)\\]");
 
     private final BotConfig config;
+    private final WebhookConfig webhookConfig;
     private final List<BotEventListener> listeners = new CopyOnWriteArrayList<>();
     private final ObjectMapper objectMapper;
 
     /**
-     * Constructs dispatcher with default {@link BotConfig} and shared {@link ObjectMapper}.
+     * Constructs dispatcher with default {@link BotConfig}, {@link WebhookConfig}, and shared {@link ObjectMapper}.
      */
     public BotEventDispatcher() {
-        this(BotConfig.builder().build(), null, BitrixJsonMapper.getMapper());
+        this(builder());
     }
 
-    /**
-     * Constructs dispatcher with specified configuration.
-     *
-     * @param config bot configuration
-     */
-    public BotEventDispatcher(BotConfig config) {
-        this(config, null, BitrixJsonMapper.getMapper());
-    }
-
-    /**
-     * Constructs dispatcher with specified configuration and initial listener.
-     *
-     * @param config bot configuration
-     * @param listener initial event listener (optional)
-     */
-    public BotEventDispatcher(BotConfig config, BotEventListener listener) {
-        this(config, listener, BitrixJsonMapper.getMapper());
-    }
-
-    /**
-     * Constructs dispatcher with configuration, listener, and customized mapper.
-     *
-     * @param config bot configuration
-     * @param listener initial event listener (optional)
-     * @param objectMapper customized Jackson ObjectMapper
-     */
-    public BotEventDispatcher(BotConfig config, BotEventListener listener, ObjectMapper objectMapper) {
-        this.config = config != null ? config : BotConfig.builder().build();
-        this.objectMapper = objectMapper != null ? objectMapper : BitrixJsonMapper.getMapper();
-        if (listener != null) {
-            this.listeners.add(listener);
+    private BotEventDispatcher(Builder builder) {
+        this.config = builder.config != null ? builder.config : BotConfig.builder().build();
+        this.webhookConfig = builder.webhookConfig != null ? builder.webhookConfig : WebhookConfig.builder().build();
+        this.objectMapper = builder.objectMapper != null ? builder.objectMapper : BitrixJsonMapper.getMapper();
+        if (builder.listener != null) {
+            this.listeners.add(builder.listener);
         }
+    }
+
+    /**
+     * Creates a new {@link Builder} to construct a {@link BotEventDispatcher}.
+     *
+     * @return dispatcher builder
+     */
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
@@ -128,12 +115,20 @@ public class BotEventDispatcher {
     }
 
     /**
+     * Returns current webhook configuration.
+     *
+     * @return webhook configuration
+     */
+    public WebhookConfig getWebhookConfig() {
+        return webhookConfig;
+    }
+
+    /**
      * Dispatches an incoming {@link Event} (from polling queue or direct call).
-     * Checks allowed events, validates application token, and forwards to listeners.
+     * Checks allowed events and forwards to listeners.
      *
      * @param event incoming event
      * @return true if event was permitted and dispatched, false if filtered out
-     * @throws SecurityException if application token validation fails
      */
     public boolean dispatch(Event event) {
         if (event == null) {
@@ -141,11 +136,6 @@ public class BotEventDispatcher {
         }
 
         EventType type = event.getType() != null ? event.getType() : EventType.UNKNOWN;
-
-        // Verify application token if event contains authentication data and token is configured
-        if (event.getAuth() != null && event.getAuth().getApplicationToken() != null) {
-            verifyApplicationToken(event.getAuth().getApplicationToken());
-        }
 
         // Filter by allowed events
         if (!config.isAllowed(type)) {
@@ -159,7 +149,7 @@ public class BotEventDispatcher {
 
     /**
      * Parses and dispatches an incoming webhook JSON payload.
-     * Performs top-level application token verification.
+     * Performs top-level application token verification using {@link WebhookConfig#getApplicationToken()}.
      *
      * @param json webhook payload JSON string
      * @return true if permitted and dispatched, false if filtered out
@@ -302,13 +292,13 @@ public class BotEventDispatcher {
     }
 
     /**
-     * Verifies that the incoming application token matches the configured {@link BotConfig#getApplicationToken()}.
+     * Verifies that the incoming application token matches the configured {@link WebhookConfig#getApplicationToken()}.
      *
      * @param incomingToken token received from Bitrix24
      * @throws SecurityException if verification fails
      */
     public void verifyApplicationToken(String incomingToken) {
-        String expectedToken = config.getApplicationToken();
+        String expectedToken = webhookConfig.getApplicationToken();
         if (expectedToken != null && !expectedToken.isBlank()) {
             if (incomingToken == null || !Objects.equals(expectedToken.trim(), incomingToken.trim())) {
                 String msg = "Bitrix24 application_token verification failed: received [" + incomingToken + "]";
@@ -479,5 +469,49 @@ public class BotEventDispatcher {
             }
         }
         return tokens;
+    }
+
+    /**
+     * Builder for {@link BotEventDispatcher}.
+     */
+    public static class Builder {
+        private BotConfig config;
+        private WebhookConfig webhookConfig;
+        private BotEventListener listener;
+        private ObjectMapper objectMapper;
+
+        public Builder config(BotConfig config) {
+            this.config = config;
+            return this;
+        }
+
+        public Builder botConfig(BotConfig config) {
+            this.config = config;
+            return this;
+        }
+
+        public Builder webhookConfig(WebhookConfig webhookConfig) {
+            this.webhookConfig = webhookConfig;
+            return this;
+        }
+
+        public Builder listener(BotEventListener listener) {
+            this.listener = listener;
+            return this;
+        }
+
+        public Builder onEvent(BotEventListener listener) {
+            this.listener = listener;
+            return this;
+        }
+
+        public Builder objectMapper(ObjectMapper objectMapper) {
+            this.objectMapper = objectMapper;
+            return this;
+        }
+
+        public BotEventDispatcher build() {
+            return new BotEventDispatcher(this);
+        }
     }
 }

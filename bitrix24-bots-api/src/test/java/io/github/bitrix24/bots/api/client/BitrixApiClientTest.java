@@ -45,7 +45,6 @@ class BitrixApiClientTest {
                 .baseUrl(server.url("/rest/1/secret_key/").toString())
                 .botId(456L)
                 .botToken("my_bot_token")
-                .applicationToken("app_token_123")
                 .build();
 
         client = BitrixApiClient.create(config);

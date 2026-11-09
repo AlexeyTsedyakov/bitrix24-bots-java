@@ -10,7 +10,6 @@ import io.github.bitrix24.bots.api.model.command.CommandAnswerFields;
 import io.github.bitrix24.bots.api.model.command.CommandAnswerRequest;
 import io.github.bitrix24.bots.api.model.event.Event;
 import io.github.bitrix24.bots.sdk.BitrixBot;
-import io.github.bitrix24.bots.sdk.config.BotConfig;
 import io.github.bitrix24.bots.sdk.config.WebhookConfig;
 import io.github.bitrix24.bots.sdk.webhook.EmbeddedWebhookServer;
 import lombok.extern.slf4j.Slf4j;
@@ -31,25 +30,19 @@ public class WebhookBotExample {
         String appToken = System.getenv().getOrDefault("BITRIX24_APP_TOKEN", "831c76b092f9f135d9b6b36c3a720757");
         int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
 
-        // 1. Configure REST client and Bot settings
+        // 1. Configure REST client and Webhook settings
         BitrixApiConfig apiConfig = BitrixApiConfig.fromWebhook(webhookUrl, botId, botToken);
         BitrixApiClient client = BitrixApiClient.create(apiConfig);
-
-        BotConfig botConfig = BotConfig.builder()
-                .botId(botId)
-                .botToken(botToken)
-                .applicationToken(appToken) // validates incoming Bitrix24 webhook token
-                .build();
 
         WebhookConfig webhookConfig = WebhookConfig.builder()
                 .port(port)
                 .path("/bitrix24/webhook")
+                .applicationToken(appToken) // validates incoming Bitrix24 webhook token
                 .build();
 
         // 2. Assemble bot facade with business logic
         BitrixBot bot = BitrixBot.builder()
                 .client(client)
-                .botConfig(botConfig)
                 .webhookConfig(webhookConfig)
                 .onEvent(event -> handleEvent(client, event))
                 .build();

@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 /**
  * Configuration options for bot polling mode ({@code imbot.v2.Event.get}).
@@ -56,17 +55,6 @@ public class PollingConfig {
      */
     @Builder.Default
     private double backoffMultiplier = 2.0;
-
-    /**
-     * Explicit bot ID override. If null, taken from {@link BotConfig#getBotId()}.
-     */
-    private Long botId;
-
-    /**
-     * Explicit bot token override. If null, taken from {@link BotConfig#getBotToken()}.
-     */
-    @ToString.Exclude
-    private String botToken;
 
     /**
      * Whether the background polling thread should run as a daemon thread.

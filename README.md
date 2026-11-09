@@ -100,7 +100,6 @@ import io.github.bitrix24.bots.api.client.BitrixApiClient;
 import io.github.bitrix24.bots.api.client.BitrixApiConfig;
 import io.github.bitrix24.bots.api.model.chat.SendMessageRequest;
 import io.github.bitrix24.bots.sdk.BitrixBot;
-import io.github.bitrix24.bots.sdk.config.BotConfig;
 import io.github.bitrix24.bots.sdk.config.PollingConfig;
 
 public class MyPollingBot {
@@ -117,7 +116,6 @@ public class MyPollingBot {
         // Сборка и запуск бота
         BitrixBot bot = BitrixBot.builder()
                 .client(client)
-                .botConfig(BotConfig.builder().botId(123L).build())
                 .pollingConfig(PollingConfig.builder().intervalMs(1000).build())
                 .onEvent(event -> {
                     if (event.isMessage()) {
@@ -147,7 +145,6 @@ import io.github.bitrix24.bots.api.client.BitrixApiClient;
 import io.github.bitrix24.bots.api.client.BitrixApiConfig;
 import io.github.bitrix24.bots.api.model.chat.SendMessageRequest;
 import io.github.bitrix24.bots.sdk.BitrixBot;
-import io.github.bitrix24.bots.sdk.config.BotConfig;
 import io.github.bitrix24.bots.sdk.config.WebhookConfig;
 
 public class MyWebhookBot {
@@ -158,12 +155,10 @@ public class MyWebhookBot {
 
         BitrixBot bot = BitrixBot.builder()
                 .client(client)
-                .botConfig(BotConfig.builder()
-                        .applicationToken("831c76b092f9f135d9b6b36c3a720757") // проверка подлинности вебхука
-                        .build())
                 .webhookConfig(WebhookConfig.builder()
                         .port(8080)
                         .path("/bitrix24/webhook")
+                        .applicationToken("831c76b092f9f135d9b6b36c3a720757") // проверка подлинности вебхука
                         .build())
                 .onEvent(event -> {
                     if (event.isJoinChat()) {

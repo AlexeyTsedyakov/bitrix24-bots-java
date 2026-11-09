@@ -110,13 +110,11 @@ class BitrixApiConfigTest {
                 .baseUrl("https://example.bitrix24.ru/rest/1/webhook_secret_key_12345/")
                 .botId(456L)
                 .botToken("secret_bot_token")
-                .applicationToken("app_token_xyz")
                 .oauthToken("secret_oauth_token")
                 .build();
 
         assertThat(config.getBotId()).isEqualTo(456L);
         assertThat(config.getBotToken()).isEqualTo("secret_bot_token");
-        assertThat(config.getApplicationToken()).isEqualTo("app_token_xyz");
         assertThat(config.getOauthToken()).isEqualTo("secret_oauth_token");
 
         // getMaskedBaseUrl masks the webhook secret
@@ -127,7 +125,6 @@ class BitrixApiConfigTest {
         String stringRep = config.toString();
         assertThat(stringRep).doesNotContain("webhook_secret_key_12345");
         assertThat(stringRep).doesNotContain("secret_bot_token");
-        assertThat(stringRep).doesNotContain("app_token_xyz");
         assertThat(stringRep).doesNotContain("secret_oauth_token");
         assertThat(stringRep).contains("https://example.bitrix24.ru/rest/1/***/");
     }

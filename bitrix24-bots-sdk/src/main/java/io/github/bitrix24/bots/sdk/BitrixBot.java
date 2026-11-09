@@ -38,37 +38,12 @@ public class BitrixBot implements AutoCloseable {
         this.pollingConfig = builder.pollingConfig != null ? builder.pollingConfig : PollingConfig.builder().build();
         this.webhookConfig = builder.webhookConfig != null ? builder.webhookConfig : WebhookConfig.builder().build();
 
-        BitrixApiConfig apiConfig = this.client.getConfig();
-
-        // Resolve applicationToken from webhookConfig or apiConfig if absent in botConfig
-        if (this.botConfig.getApplicationToken() == null || this.botConfig.getApplicationToken().isBlank()) {
-            if (this.webhookConfig.getApplicationToken() != null && !this.webhookConfig.getApplicationToken().isBlank()) {
-                this.botConfig.setApplicationToken(this.webhookConfig.getApplicationToken());
-            } else if (apiConfig != null && apiConfig.getApplicationToken() != null && !apiConfig.getApplicationToken().isBlank()) {
-                this.botConfig.setApplicationToken(apiConfig.getApplicationToken());
-            }
-        }
-
-        // Propagate botId and botToken from apiConfig to botConfig if not set
-        if (apiConfig != null) {
-            if (this.botConfig.getBotId() == null && apiConfig.getBotId() != null) {
-                this.botConfig.setBotId(apiConfig.getBotId());
-            }
-            if (this.botConfig.getBotToken() == null && apiConfig.getBotToken() != null) {
-                this.botConfig.setBotToken(apiConfig.getBotToken());
-            }
-        }
-
-        // Propagate botId and botToken from botConfig to pollingConfig if not explicitly overridden
-        if (this.pollingConfig.getBotId() == null && this.botConfig.getBotId() != null) {
-            this.pollingConfig.setBotId(this.botConfig.getBotId());
-        }
-        if (this.pollingConfig.getBotToken() == null && this.botConfig.getBotToken() != null) {
-            this.pollingConfig.setBotToken(this.botConfig.getBotToken());
-        }
-
         // Initialize dispatcher
-        this.dispatcher = new BotEventDispatcher(this.botConfig, builder.listener);
+        this.dispatcher = BotEventDispatcher.builder()
+                .botConfig(this.botConfig)
+                .webhookConfig(this.webhookConfig)
+                .listener(builder.listener)
+                .build();
     }
 
     /**

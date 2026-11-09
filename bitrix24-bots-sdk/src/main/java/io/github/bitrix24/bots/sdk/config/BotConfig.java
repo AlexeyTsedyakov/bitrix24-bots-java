@@ -5,14 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
 /**
- * Configuration for Bitrix24 Bot event receiving, authentication, and event filtering.
+ * Configuration for Bitrix24 Bot event receiving and event filtering.
  */
 @Data
 @Builder
@@ -26,23 +25,6 @@ public class BotConfig {
      */
     @Builder.Default
     private Set<EventType> allowedEvents = EnumSet.allOf(EventType.class);
-
-    /**
-     * Secret application token assigned by Bitrix24 to verify incoming webhook notifications.
-     */
-    @ToString.Exclude
-    private String applicationToken;
-
-    /**
-     * Bot authorization token (used in REST API calls for webhook mode).
-     */
-    @ToString.Exclude
-    private String botToken;
-
-    /**
-     * Bot identifier in Bitrix24.
-     */
-    private Long botId;
 
     /**
      * Unique bot code in Bitrix24.

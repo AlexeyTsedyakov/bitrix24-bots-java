@@ -8,7 +8,6 @@ import io.github.bitrix24.bots.api.model.chat.keyboard.Keyboard;
 import io.github.bitrix24.bots.api.model.chat.keyboard.KeyboardButton;
 import io.github.bitrix24.bots.api.model.event.Event;
 import io.github.bitrix24.bots.sdk.BitrixBot;
-import io.github.bitrix24.bots.sdk.config.BotConfig;
 import io.github.bitrix24.bots.sdk.config.PollingConfig;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,12 +28,7 @@ public class EchoPollingBotExample {
         BitrixApiConfig apiConfig = BitrixApiConfig.fromWebhook(webhookUrl, botId, botToken);
         BitrixApiClient client = BitrixApiClient.create(apiConfig);
 
-        // 2. Configure bot and polling runner
-        BotConfig botConfig = BotConfig.builder()
-                .botId(botId)
-                .botToken(botToken)
-                .build();
-
+        // 2. Configure polling runner
         PollingConfig pollingConfig = PollingConfig.builder()
                 .intervalMs(1000L) // poll every 1 second when queue is empty
                 .limit(100)
@@ -43,7 +37,6 @@ public class EchoPollingBotExample {
         // 3. Assemble bot facade
         BitrixBot bot = BitrixBot.builder()
                 .client(client)
-                .botConfig(botConfig)
                 .pollingConfig(pollingConfig)
                 .onEvent(event -> handleEvent(client, event))
                 .build();

@@ -28,12 +28,14 @@ class BitrixBotTest {
     @DisplayName("Builds BitrixBot with fluent builder and initializes components")
     void testBuilderInitialization() {
         AtomicBoolean closed = new AtomicBoolean(false);
-        BitrixApiClient client = new DummyClient(closed);
-
-        BotConfig botConfig = BotConfig.builder()
+        BitrixApiConfig apiConfig = BitrixApiConfig.builder()
                 .botId(101L)
                 .botToken("token_101")
-                .applicationToken("app_token_101")
+                .build();
+        BitrixApiClient client = new DummyClient(closed, apiConfig);
+
+        BotConfig botConfig = BotConfig.builder()
+                .botCode("bot_101")
                 .build();
 
         PollingConfig pollingConfig = PollingConfig.builder()
@@ -44,6 +46,7 @@ class BitrixBotTest {
         WebhookConfig webhookConfig = WebhookConfig.builder()
                 .port(8081)
                 .path("/custom/path")
+                .applicationToken("app_token_101")
                 .build();
 
         BitrixBot bot = BitrixBot.builder()
@@ -127,11 +130,15 @@ class BitrixBotTest {
 
     // --- Dummy Client for testing facade ---
 
-    private record DummyClient(AtomicBoolean closed) implements BitrixApiClient {
+    private record DummyClient(AtomicBoolean closed, BitrixApiConfig config) implements BitrixApiClient {
+
+        DummyClient(AtomicBoolean closed) {
+            this(closed, null);
+        }
 
         @Override
         public BitrixApiConfig getConfig() {
-            return null;
+            return config;
         }
 
         @Override
