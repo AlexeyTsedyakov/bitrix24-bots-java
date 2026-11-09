@@ -98,7 +98,7 @@ class EmbeddedWebhookServerTest {
         Event event = receivedEvents.get(0);
         assertThat(event.isMessage()).isTrue();
         assertThat(event.getMessageText()).isEqualTo("Hello from embedded server test");
-        assertThat(event.getChatId()).isEqualTo("10");
+        assertThat(event.getChatId()).isEqualTo(10L);
         assertThat(event.getDialogId()).isEqualTo("chat10");
     }
 
@@ -128,7 +128,7 @@ class EmbeddedWebhookServerTest {
         assertThat(event.isCommand()).isTrue();
         assertThat(event.getCommandName()).isEqualTo("/start");
         assertThat(event.getCommandParams()).isEqualTo("welcome");
-        assertThat(event.getChatId()).isEqualTo("55");
+        assertThat(event.getChatId()).isEqualTo(55L);
     }
 
     @Test

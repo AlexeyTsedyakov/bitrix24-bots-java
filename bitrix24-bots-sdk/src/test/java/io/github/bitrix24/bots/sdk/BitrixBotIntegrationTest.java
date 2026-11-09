@@ -136,7 +136,7 @@ class BitrixBotIntegrationTest {
         assertThat(event.isCommand()).isTrue();
         assertThat(event.getCommandName()).isEqualTo("/help");
         assertThat(event.getUserName()).isEqualTo("Alexander");
-        assertThat(event.getChatId()).isEqualTo("5");
+        assertThat(event.getChatId()).isEqualTo(5L);
         assertThat(event.getDialogId()).isEqualTo("chat5");
 
         // Verify command answer was triggered

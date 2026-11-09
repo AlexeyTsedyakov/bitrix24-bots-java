@@ -48,7 +48,7 @@ class EventTest {
                 .type(EventType.ONIMBOTV2MESSAGEADD)
                 .date(Instant.parse("2025-01-01T00:00:00Z"))
                 .data(EventData.builder()
-                        .chat(ChatInfo.builder().id("100").dialogId("chat100").name("My Chat").build())
+                        .chat(ChatInfo.builder().id(100L).dialogId("chat100").name("My Chat").build())
                         .message(MessageInfo.builder().id(200L).text("Ping message").build())
                         .user(UserInfo.builder().id(300L).name("John Doe").build())
                         .command(CommandInfo.builder().id(400L).command("/start").params("param1").build())
@@ -58,7 +58,7 @@ class EventTest {
                 .build();
 
         assertThat(event.getEventId()).isEqualTo(12345L);
-        assertThat(event.getChatId()).isEqualTo("100");
+        assertThat(event.getChatId()).isEqualTo(100L);
         assertThat(event.getDialogId()).isEqualTo("chat100");
         assertThat(event.getMessageText()).isEqualTo("Ping message");
         assertThat(event.getUserId()).isEqualTo(300L);
@@ -68,22 +68,6 @@ class EventTest {
         assertThat(event.getBotId()).isEqualTo(500L);
         assertThat(event.getAuth()).isNotNull();
         assertThat(event.getAuth().getApplicationToken()).isEqualTo("tok_123");
-    }
-
-    @Test
-    @DisplayName("Tests ChatInfo numeric id parsing")
-    void testChatInfoNumericId() {
-        ChatInfo chatNum = ChatInfo.builder().id("55").build();
-        assertThat(chatNum.getNumericId()).isEqualTo(55L);
-
-        ChatInfo chatPrefixed = ChatInfo.builder().id("chat123").build();
-        assertThat(chatPrefixed.getNumericId()).isEqualTo(123L);
-
-        ChatInfo chatInvalid = ChatInfo.builder().id("invalid").build();
-        assertThat(chatInvalid.getNumericId()).isNull();
-
-        ChatInfo chatNull = ChatInfo.builder().id(null).build();
-        assertThat(chatNull.getNumericId()).isNull();
     }
 
     @Test

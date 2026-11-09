@@ -113,7 +113,7 @@ class BotEventDispatcherTest {
         assertThat(event.getDate()).isEqualTo(Instant.parse("2025-01-15T10:30:00Z"));
         assertThat(event.isMessage()).isTrue();
         assertThat(event.getMessageText()).isEqualTo("Hello world from test");
-        assertThat(event.getChatId()).isEqualTo("5");
+        assertThat(event.getChatId()).isEqualTo(5L);
         assertThat(event.getDialogId()).isEqualTo("chat5");
         assertThat(event.getUserId()).isEqualTo(42L);
         assertThat(event.getUserName()).isEqualTo("Ivan Ivanov");
@@ -163,7 +163,7 @@ class BotEventDispatcherTest {
         assertThat(event.getCommandName()).isEqualTo("/help");
         assertThat(event.getCommandParams()).isEqualTo("general");
         assertThat(event.getBotId()).isEqualTo(10L);
-        assertThat(event.getChatId()).isEqualTo("12");
+        assertThat(event.getChatId()).isEqualTo(12L);
         assertThat(event.getAuth()).isNotNull();
         assertThat(event.getAuth().getApplicationToken()).isEqualTo("valid_secret_token_123");
         assertThat(event.getAuth().getDomain()).isEqualTo("portal.bitrix24.ru");
@@ -238,7 +238,7 @@ class BotEventDispatcherTest {
         Event event = received.get(0);
         assertThat(event.isMessage()).isTrue();
         assertThat(event.getMessageText()).isEqualTo("Hello from webhook");
-        assertThat(event.getChatId()).isEqualTo("99");
+        assertThat(event.getChatId()).isEqualTo(99L);
         assertThat(event.getDialogId()).isEqualTo("chat99");
         assertThat(event.getUserId()).isEqualTo(7L);
         assertThat(event.getUserName()).isEqualTo("Alice");

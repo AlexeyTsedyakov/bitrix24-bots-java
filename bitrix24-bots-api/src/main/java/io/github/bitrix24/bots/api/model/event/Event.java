@@ -108,7 +108,7 @@ public class Event {
      *
      * @return chat ID or null
      */
-    public String getChatId() {
+    public Long getChatId() {
         return data != null && data.getChat() != null ? data.getChat().getId() : null;
     }
 
