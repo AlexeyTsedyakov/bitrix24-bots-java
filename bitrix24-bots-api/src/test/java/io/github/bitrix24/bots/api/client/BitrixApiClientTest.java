@@ -229,6 +229,8 @@ class BitrixApiClientTest {
         assertThat(req.getPath()).isEqualTo("/rest/1/secret_key/imbot.v2.Chat.Message.send");
         String body = req.getBody().readUtf8();
         assertThat(body).contains("\"dialogId\":\"chat5\"");
+        assertThat(body).contains("\"BOT_ID\":456");
+        assertThat(body).contains("\"BUTTONS\":[");
         assertThat(body).contains("\"TEXT\":\"Website\"");
         assertThat(body).contains("\"COLOR_TOKEN\":\"primary\"");
     }

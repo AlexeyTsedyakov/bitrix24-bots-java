@@ -1,11 +1,11 @@
 package io.github.bitrix24.bots.api.model.chat.keyboard;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.jackson.Jacksonized;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,15 +18,22 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Jacksonized
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Keyboard {
 
+    @JsonProperty("BUTTONS")
     @Builder.Default
     private List<KeyboardButton> buttons = new ArrayList<>();
 
-    @JsonValue
     public List<KeyboardButton> getButtons() {
         return buttons;
+    }
+
+    @JsonIgnore
+    public boolean isEmpty() {
+        return buttons == null || buttons.isEmpty();
     }
 
     public Keyboard addButton(KeyboardButton button) {

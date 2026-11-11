@@ -39,6 +39,7 @@ class KeyboardAndAttachSerializationTest {
 
         String json = BitrixJsonMapper.toJson(keyboard);
 
+        assertThat(json).contains("\"BUTTONS\":[");
         assertThat(json).contains("\"TEXT\":\"Bitrix24 Docs\"");
         assertThat(json).contains("\"LINK\":\"https://apidocs.bitrix24.ru\"");
         assertThat(json).contains("\"TYPE\":\"NEWLINE\"");
@@ -58,6 +59,9 @@ class KeyboardAndAttachSerializationTest {
         assertThat(json).contains("\"ACTION\":\"PUT\"");
         assertThat(json).contains("\"ACTION_VALUE\":\"/help\"");
         assertThat(json).contains("\"ACTION\":\"SEND\"");
+
+        Keyboard deserializedKeyboard = BitrixJsonMapper.fromJson(json, Keyboard.class);
+        assertThat(deserializedKeyboard).isEqualTo(keyboard);
 
         KeyboardButton button = keyboard.getButtons().get(2);
         String buttonJson = BitrixJsonMapper.toJson(button);

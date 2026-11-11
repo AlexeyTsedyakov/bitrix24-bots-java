@@ -140,6 +140,7 @@ public class DefaultBitrixApiClient implements BitrixApiClient {
             throw new BitrixApiException("JSON_PARSE_ERROR", "Failed to parse Bitrix24 response as JSON: " + responseBody, httpResponse.getStatusCode(), null, e);
         }
 
+        // TODO: Может стоит сразу прокидывать исключение?
         if (root.has("error")) {
             String error = root.path("error").asString(null);
             String errorDesc = root.path("error_description").asString(null);
@@ -230,9 +231,16 @@ public class DefaultBitrixApiClient implements BitrixApiClient {
         boolean isImbot = method.startsWith("imbot.v2.");
 
         // Inject botId if configured and not explicitly provided
-        if (config.getBotId() != null && isImbot && !objNode.has("botId")) {
-            if (!"imbot.v2.Bot.register".equals(method)) {
+        if (config.getBotId() != null && isImbot) {
+            if (!objNode.has("botId") && !"imbot.v2.Bot.register".equals(method)) {
                 objNode.put("botId", config.getBotId());
+            }
+            JsonNode fieldsNode = objNode.get("fields");
+            if (fieldsNode instanceof ObjectNode fn) {
+                JsonNode keyboardNode = fn.get("keyboard");
+                if (keyboardNode instanceof ObjectNode kn) {
+                    kn.put("BOT_ID", config.getBotId());
+                }
             }
         }
 

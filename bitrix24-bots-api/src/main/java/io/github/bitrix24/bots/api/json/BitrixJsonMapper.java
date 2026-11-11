@@ -92,7 +92,9 @@ public final class BitrixJsonMapper {
                 .withCoercionConfig(LogicalType.DateTime, cfg ->
                         cfg.setCoercion(CoercionInputShape.EmptyString, CoercionAction.AsNull))
                 .withCoercionConfig(LogicalType.Collection, cfg ->
-                        cfg.setCoercion(CoercionInputShape.EmptyString, CoercionAction.AsNull));
+                        cfg.setCoercion(CoercionInputShape.EmptyString, CoercionAction.AsNull))
+                .withCoercionConfig(LogicalType.POJO, cfg ->
+                        cfg.setCoercion(CoercionInputShape.EmptyArray, CoercionAction.AsNull));
     }
 
     /**
@@ -125,9 +127,9 @@ public final class BitrixJsonMapper {
     /**
      * Deserializes a JSON string into an instance of the specified class.
      *
-     * @param json JSON string
+     * @param json  JSON string
      * @param clazz target class
-     * @param <T> result type
+     * @param <T>   result type
      * @return deserialized object
      * @throws BitrixApiException if deserialization fails
      */
@@ -145,9 +147,9 @@ public final class BitrixJsonMapper {
     /**
      * Deserializes a JSON string using a {@link TypeReference}.
      *
-     * @param json JSON string
+     * @param json          JSON string
      * @param typeReference target type reference
-     * @param <T> result type
+     * @param <T>           result type
      * @return deserialized object
      * @throws BitrixApiException if deserialization fails
      */
@@ -165,9 +167,9 @@ public final class BitrixJsonMapper {
     /**
      * Deserializes a JSON string using a Jackson {@link JavaType}.
      *
-     * @param json JSON string
+     * @param json     JSON string
      * @param javaType target java type
-     * @param <T> result type
+     * @param <T>      result type
      * @return deserialized object
      * @throws BitrixApiException if deserialization fails
      */
@@ -186,8 +188,8 @@ public final class BitrixJsonMapper {
      * Deserializes an input stream into an instance of the specified class.
      *
      * @param inputStream input stream containing JSON
-     * @param clazz target class
-     * @param <T> result type
+     * @param clazz       target class
+     * @param <T>         result type
      * @return deserialized object
      * @throws BitrixApiException if deserialization fails
      */
@@ -223,9 +225,9 @@ public final class BitrixJsonMapper {
     /**
      * Converts an arbitrary object or map into the target type.
      *
-     * @param fromValue source object
+     * @param fromValue   source object
      * @param toValueType target class
-     * @param <T> target type
+     * @param <T>         target type
      * @return converted object
      */
     public static <T> T convertValue(Object fromValue, Class<T> toValueType) {
@@ -235,9 +237,9 @@ public final class BitrixJsonMapper {
     /**
      * Converts an arbitrary object or map into the target type reference.
      *
-     * @param fromValue source object
+     * @param fromValue      source object
      * @param toValueTypeRef target type reference
-     * @param <T> target type
+     * @param <T>            target type
      * @return converted object
      */
     public static <T> T convertValue(Object fromValue, TypeReference<T> toValueTypeRef) {
@@ -247,9 +249,9 @@ public final class BitrixJsonMapper {
     /**
      * Helper to deserialize a Bitrix24 REST response wrapper containing a typed payload.
      *
-     * @param json JSON response string
+     * @param json         JSON response string
      * @param payloadClass class of the payload in the {@code result} field
-     * @param <T> payload type
+     * @param <T>          payload type
      * @return typed {@link BitrixResponse}
      */
     public static <T> BitrixResponse<T> parseResponse(String json, Class<T> payloadClass) {
