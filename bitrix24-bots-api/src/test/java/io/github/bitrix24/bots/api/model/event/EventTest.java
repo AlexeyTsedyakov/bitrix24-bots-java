@@ -1,6 +1,7 @@
 package io.github.bitrix24.bots.api.model.event;
 
 import io.github.bitrix24.bots.api.json.BitrixJsonMapper;
+import io.github.bitrix24.bots.api.model.object.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -50,7 +51,7 @@ class EventTest {
                 .data(EventData.builder()
                         .chat(ChatInfo.builder().id(100L).dialogId("chat100").name("My Chat").build())
                         .message(MessageInfo.builder().id(200L).text("Ping message").build())
-                        .user(UserInfo.builder().id(300L).name("John Doe").build())
+                        .user(User.builder().id(300L).name("John Doe").build())
                         .command(CommandInfo.builder().id(400L).command("/start").params("param1").build())
                         .bot(BotInfo.builder().id(500L).code("bot_code").build())
                         .auth(AuthInfo.builder().applicationToken("tok_123").domain("myportal.ru").build())
@@ -97,5 +98,106 @@ class EventTest {
         assertThat(parsed.isMessage()).isTrue();
         assertThat(parsed.getMessageText()).isEqualTo("hello");
         assertThat(parsed.getDialogId()).isEqualTo("chat5");
+    }
+
+    @Test
+    @DisplayName("Tests object.User deserialization for API responses and event/webhook compound fields")
+    void testUserDeserialization() {
+        String apiUserJson = """
+                {
+                    "id": 1,
+                    "active": true,
+                    "name": "John Smith",
+                    "firstName": "John",
+                    "lastName": "Smith",
+                    "workPosition": "Developer",
+                    "color": "#df532d",
+                    "avatar": "https://example.bitrix24.com/avatar.png",
+                    "gender": "M",
+                    "birthday": "15-03",
+                    "extranet": false,
+                    "bot": false,
+                    "connector": false,
+                    "externalAuthId": "default",
+                    "status": "online",
+                    "idle": "2025-01-15T10:00:00+03:00",
+                    "lastActivityDate": "2025-01-15T14:25:00+03:00",
+                    "mobileLastDate": false,
+                    "desktopLastDate": "2025-01-15T14:25:00+03:00",
+                    "absent": "2025-01-20T00:00:00+03:00",
+                    "departments": [1, 5],
+                    "phones": {
+                        "work_phone": "+11234567890",
+                        "personal_mobile": "+10987654321"
+                    },
+                    "type": "user",
+                    "internalAccount": false,
+                    "intranetUser": true,
+                    "website": "https://example.com",
+                    "email": "john@example.com"
+                }
+                """;
+
+        User apiUser = BitrixJsonMapper.fromJson(apiUserJson, User.class);
+        assertThat(apiUser).isNotNull();
+        assertThat(apiUser.getId()).isEqualTo(1L);
+        assertThat(apiUser.getActive()).isTrue();
+        assertThat(apiUser.getName()).isEqualTo("John Smith");
+        assertThat(apiUser.getFirstName()).isEqualTo("John");
+        assertThat(apiUser.getLastName()).isEqualTo("Smith");
+        assertThat(apiUser.getWorkPosition()).isEqualTo("Developer");
+        assertThat(apiUser.getColor()).isEqualTo("#df532d");
+        assertThat(apiUser.getAvatar()).isEqualTo("https://example.bitrix24.com/avatar.png");
+        assertThat(apiUser.getGender()).isEqualTo("M");
+        assertThat(apiUser.getBirthday()).isEqualTo("15-03");
+        assertThat(apiUser.getExtranet()).isFalse();
+        assertThat(apiUser.getBot()).isFalse();
+        assertThat(apiUser.getConnector()).isFalse();
+        assertThat(apiUser.getExternalAuthId()).isEqualTo("default");
+        assertThat(apiUser.getStatus()).isEqualTo("online");
+        assertThat(apiUser.getIdle()).isTrue();
+        assertThat(apiUser.getLastActivityDate()).isEqualTo(Instant.parse("2025-01-15T11:25:00Z"));
+        assertThat(apiUser.getMobileLastDate()).isNull();
+        assertThat(apiUser.getDesktopLastDate()).isEqualTo(Instant.parse("2025-01-15T11:25:00Z"));
+        assertThat(apiUser.getAbsent()).isTrue();
+        assertThat(apiUser.getDepartments()).containsExactly(1L, 5L);
+        assertThat(apiUser.getPhones()).isNotNull();
+        assertThat(apiUser.getPhones().get("work_phone").asString()).isEqualTo("+11234567890");
+        assertThat(apiUser.getPhones().get("personal_mobile").asString()).isEqualTo("+10987654321");
+        assertThat(apiUser.getType()).isEqualTo("user");
+        assertThat(apiUser.getInternalAccount()).isFalse();
+        assertThat(apiUser.getIntranetUser()).isTrue();
+        assertThat(apiUser.getWebsite()).isEqualTo("https://example.com");
+        assertThat(apiUser.getEmail()).isEqualTo("john@example.com");
+
+        String webhookUserJson = """
+                {
+                    "id": "7",
+                    "active": "1",
+                    "name": "Alice",
+                    "idle": "0",
+                    "lastActivityDate": "0",
+                    "mobileLastDate": "0",
+                    "desktopLastDate": "0",
+                    "absent": "0",
+                    "phones": false,
+                    "internalAccount": "1",
+                    "intranetUser": "0"
+                }
+                """;
+
+        User webhookUser = BitrixJsonMapper.fromJson(webhookUserJson, User.class);
+        assertThat(webhookUser).isNotNull();
+        assertThat(webhookUser.getId()).isEqualTo(7L);
+        assertThat(webhookUser.getActive()).isTrue();
+        assertThat(webhookUser.getIdle()).isFalse();
+        assertThat(webhookUser.getLastActivityDate()).isNull();
+        assertThat(webhookUser.getMobileLastDate()).isNull();
+        assertThat(webhookUser.getDesktopLastDate()).isNull();
+        assertThat(webhookUser.getAbsent()).isFalse();
+        assertThat(webhookUser.getPhones().isBoolean()).isTrue();
+        assertThat(webhookUser.getPhones().asBoolean()).isFalse();
+        assertThat(webhookUser.getInternalAccount()).isTrue();
+        assertThat(webhookUser.getIntranetUser()).isFalse();
     }
 }
