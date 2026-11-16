@@ -228,6 +228,7 @@ class BotEventDispatcherTest {
                 + "&data%5Bbot%5D%5BisReactionsEnabled%5D=1"
                 + "&data%5Bchat%5D%5Bid%5D=99"
                 + "&data%5Bchat%5D%5BdialogId%5D=chat99"
+                + "&data%5Bchat%5D%5BdiskFolderId%5D="
                 + "&data%5Bmessage%5D%5Bid%5D=888"
                 + "&data%5Bmessage%5D%5BchatId%5D=99"
                 + "&data%5Bmessage%5D%5BauthorId%5D=7"
@@ -235,7 +236,6 @@ class BotEventDispatcherTest {
                 + "&data%5Bmessage%5D%5Btext%5D=Hello+from+webhook"
                 + "&data%5Bmessage%5D%5BisSystem%5D=0"
                 + "&data%5Bmessage%5D%5BviewedByOthers%5D=1"
-                + "&data%5Bmessage%5D%5BreplyId%5D="
                 + "&data%5Buser%5D%5Bid%5D=7"
                 + "&data%5Buser%5D%5Bactive%5D=1"
                 + "&data%5Buser%5D%5Bname%5D=Alice"
@@ -264,9 +264,9 @@ class BotEventDispatcherTest {
         assertThat(event.getData().getBot().getIsHidden()).isFalse();
         assertThat(event.getData().getBot().getIsSupportOpenline()).isFalse();
         assertThat(event.getData().getBot().getIsReactionsEnabled()).isTrue();
+        assertThat(event.getData().getChat().getDiskFolderId()).isNull();
         assertThat(event.getData().getMessage().getIsSystem()).isFalse();
         assertThat(event.getData().getMessage().getViewedByOthers()).isTrue();
-        assertThat(event.getData().getMessage().getReplyId()).isNull();
         assertThat(event.getData().getMessage().getDate()).isEqualTo(Instant.parse("2025-01-15T07:30:00Z"));
         assertThat(event.getData().getUser().getActive()).isTrue();
         assertThat(event.getData().getUser().getExtranet()).isFalse();

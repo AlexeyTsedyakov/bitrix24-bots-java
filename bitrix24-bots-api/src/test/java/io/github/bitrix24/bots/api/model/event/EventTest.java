@@ -50,7 +50,7 @@ class EventTest {
                 .date(Instant.parse("2025-01-01T00:00:00Z"))
                 .data(EventData.builder()
                         .chat(ChatInfo.builder().id(100L).dialogId("chat100").name("My Chat").build())
-                        .message(MessageInfo.builder().id(200L).text("Ping message").build())
+                        .message(Message.builder().id(200L).text("Ping message").build())
                         .user(User.builder().id(300L).name("John Doe").build())
                         .command(CommandInfo.builder().id(400L).command("/start").params("param1").build())
                         .bot(BotInfo.builder().id(500L).code("bot_code").build())
@@ -199,5 +199,83 @@ class EventTest {
         assertThat(webhookUser.getPhones().asBoolean()).isFalse();
         assertThat(webhookUser.getInternalAccount()).isTrue();
         assertThat(webhookUser.getIntranetUser()).isFalse();
+    }
+
+    @Test
+    @DisplayName("Tests object.Message deserialization for events and method responses")
+    void testMessageDeserialization() {
+        String methodMessageJson = """
+                {
+                    "id": 789,
+                    "chatId": 5,
+                    "authorId": 1,
+                    "date": "2025-01-15T10:30:00+03:00",
+                    "text": "Forwarded hello",
+                    "isSystem": false,
+                    "uuid": "uuid-123",
+                    "forward": {
+                        "id": "3/100",
+                        "userId": 2,
+                        "chatTitle": "Source Chat",
+                        "chatType": "chat",
+                        "parentChatId": 0,
+                        "parentMessageId": 0,
+                        "parentChatType": ""
+                    },
+                    "params": {
+                        "REPLY_ID": "780",
+                        "IS_EDITED": "Y"
+                    },
+                    "viewedByOthers": true,
+                    "unread": false,
+                    "viewed": true
+                }
+                """;
+
+        Message methodMessage = BitrixJsonMapper.fromJson(methodMessageJson, Message.class);
+        assertThat(methodMessage).isNotNull();
+        assertThat(methodMessage.getId()).isEqualTo(789L);
+        assertThat(methodMessage.getChatId()).isEqualTo(5L);
+        assertThat(methodMessage.getAuthorId()).isEqualTo(1L);
+        assertThat(methodMessage.getDate()).isEqualTo(Instant.parse("2025-01-15T07:30:00Z"));
+        assertThat(methodMessage.getText()).isEqualTo("Forwarded hello");
+        assertThat(methodMessage.getIsSystem()).isFalse();
+        assertThat(methodMessage.getUuid()).isEqualTo("uuid-123");
+        assertThat(methodMessage.getForward()).isNotNull();
+        assertThat(methodMessage.getForward().get("id").asString()).isEqualTo("3/100");
+        assertThat(methodMessage.getForward().get("userId").asLong()).isEqualTo(2L);
+        assertThat(methodMessage.getParams()).isNotNull();
+        assertThat(methodMessage.getParams().get("REPLY_ID").asString()).isEqualTo("780");
+        assertThat(methodMessage.getViewedByOthers()).isTrue();
+        assertThat(methodMessage.getUnread()).isFalse();
+        assertThat(methodMessage.getViewed()).isTrue();
+
+        String eventMessageJson = """
+                {
+                    "id": 790,
+                    "chatId": 5,
+                    "authorId": 0,
+                    "date": "2025-01-15T10:35:00+03:00",
+                    "text": "System message",
+                    "isSystem": true,
+                    "uuid": null,
+                    "forward": null,
+                    "params": [],
+                    "viewedByOthers": false
+                }
+                """;
+
+        Message eventMessage = BitrixJsonMapper.fromJson(eventMessageJson, Message.class);
+        assertThat(eventMessage).isNotNull();
+        assertThat(eventMessage.getId()).isEqualTo(790L);
+        assertThat(eventMessage.getAuthorId()).isEqualTo(0L);
+        assertThat(eventMessage.getIsSystem()).isTrue();
+        assertThat(eventMessage.getUuid()).isNull();
+        assertThat(eventMessage.getForward().isNull()).isTrue();
+        assertThat(eventMessage.getParams().isArray()).isTrue();
+        assertThat(eventMessage.getParams()).isEmpty();
+        assertThat(eventMessage.getViewedByOthers()).isFalse();
+        assertThat(eventMessage.getUnread()).isNull();
+        assertThat(eventMessage.getViewed()).isNull();
     }
 }

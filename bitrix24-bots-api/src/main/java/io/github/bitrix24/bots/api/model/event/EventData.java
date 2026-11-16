@@ -2,6 +2,7 @@ package io.github.bitrix24.bots.api.model.event;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.github.bitrix24.bots.api.model.object.Message;
 import io.github.bitrix24.bots.api.model.object.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,7 +23,7 @@ import tools.jackson.databind.JsonNode;
 public class EventData {
 
     private BotInfo bot;
-    private MessageInfo message;
+    private Message message;
     private ChatInfo chat;
     private User user;
     private CommandInfo command;
