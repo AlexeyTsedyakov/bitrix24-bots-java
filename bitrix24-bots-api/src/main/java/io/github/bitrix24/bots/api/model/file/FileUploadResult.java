@@ -1,6 +1,7 @@
 package io.github.bitrix24.bots.api.model.file;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.github.bitrix24.bots.api.model.object.File;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,7 +19,7 @@ import lombok.extern.jackson.Jacksonized;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FileUploadResult {
 
-    private FileInfo file;
+    private File file;
     private Long messageId;
     private Long chatId;
     private String dialogId;
