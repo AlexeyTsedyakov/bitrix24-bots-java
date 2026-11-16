@@ -2,6 +2,7 @@ package io.github.bitrix24.bots.api.model.event;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.github.bitrix24.bots.api.model.event.Auth;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -55,5 +56,5 @@ public class BotInfo {
     @JsonAlias({"count_user", "countUser"})
     private Integer countUser;
 
-    private AuthInfo auth;
+    private Auth auth;
 }

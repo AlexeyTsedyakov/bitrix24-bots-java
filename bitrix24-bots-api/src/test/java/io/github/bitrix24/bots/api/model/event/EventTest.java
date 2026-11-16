@@ -55,6 +55,7 @@ class EventTest {
                         .command(Command.builder().id("400").command("/start").params("param1").build())
                         .bot(BotInfo.builder().id(500L).code("bot_code").build())
                         .auth(AuthInfo.builder().applicationToken("tok_123").domain("myportal.ru").build())
+                        .auth(Auth.builder().applicationToken("tok_123").domain("myportal.ru").build())
                         .build())
                 .build();
 
@@ -560,5 +561,47 @@ class EventTest {
         assertThat(webhookChat.getCanHaveThreads()).isTrue();
         assertThat(webhookChat.getPublicSettings().isString()).isTrue();
         assertThat(webhookChat.getPublicSettings().asString()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Tests event.Auth deserialization for webhook auth and data.bot.auth payloads")
+    void testAuthDeserialization() {
+        String webhookAuthJson = """
+                {
+                    "access_token": "0b02a0690000071b0008440001b0007a16b39202c2490f015",
+                    "expires_in": "3600",
+                    "scope": "imbot",
+                    "domain": "some-domain.bitrix24.ru",
+                    "server_endpoint": "https://oauth.bitrix24.tech/rest/",
+                    "status": "F",
+                    "client_endpoint": "https://some-domain.bitrix24.ru/rest/",
+                    "member_id": "bac1cd5c8940947a75e0d71b1a84e348",
+                    "refresh_token": "refresh_tok_456",
+                    "application_token": "831c76b092f9f135d9b6b36c3a720757"
+                }
+                """;
+
+        Auth auth = BitrixJsonMapper.fromJson(webhookAuthJson, Auth.class);
+        assertThat(auth).isNotNull();
+        assertThat(auth.getAccessToken()).isEqualTo("0b02a0690000071b0008440001b0007a16b39202c2490f015");
+        assertThat(auth.getExpiresIn()).isEqualTo(3600L);
+        assertThat(auth.getScope()).isEqualTo("imbot");
+        assertThat(auth.getDomain()).isEqualTo("some-domain.bitrix24.ru");
+        assertThat(auth.getServerEndpoint()).isEqualTo("https://oauth.bitrix24.tech/rest/");
+        assertThat(auth.getStatus()).isEqualTo("F");
+        assertThat(auth.getClientEndpoint()).isEqualTo("https://some-domain.bitrix24.ru/rest/");
+        assertThat(auth.getMemberId()).isEqualTo("bac1cd5c8940947a75e0d71b1a84e348");
+        assertThat(auth.getRefreshToken()).isEqualTo("refresh_tok_456");
+        assertThat(auth.getApplicationToken()).isEqualTo("831c76b092f9f135d9b6b36c3a720757");
+        assertThat(auth.toString())
+                .doesNotContain("0b02a0690000071b0008440001b0007a16b39202c2490f015")
+                .doesNotContain("refresh_tok_456")
+                .doesNotContain("831c76b092f9f135d9b6b36c3a720757");
+
+        String serialized = BitrixJsonMapper.toJson(auth);
+        assertThat(serialized)
+                .contains("\"access_token\":\"0b02a0690000071b0008440001b0007a16b39202c2490f015\"")
+                .contains("\"expires_in\":3600")
+                .contains("\"application_token\":\"831c76b092f9f135d9b6b36c3a720757\"");
     }
 }

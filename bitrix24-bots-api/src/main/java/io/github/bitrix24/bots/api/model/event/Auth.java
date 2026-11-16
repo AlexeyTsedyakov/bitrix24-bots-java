@@ -1,7 +1,7 @@
 package io.github.bitrix24.bots.api.model.event;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,40 +18,34 @@ import lombok.extern.jackson.Jacksonized;
 @AllArgsConstructor
 @Jacksonized
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AuthInfo {
-
-    private String domain;
+public class Auth {
 
     @ToString.Exclude
-    @JsonAlias({"application_token", "applicationToken"})
-    private String applicationToken;
-
-    @ToString.Exclude
-    @JsonAlias({"access_token", "accessToken"})
+    @JsonProperty("access_token")
     private String accessToken;
 
-    private String expires;
-
-    @JsonAlias({"expires_in", "expiresIn"})
+    @JsonProperty("expires_in")
     private Long expiresIn;
 
     private String scope;
+    private String domain;
 
-    @JsonAlias({"server_endpoint", "serverEndpoint"})
+    @JsonProperty("server_endpoint")
     private String serverEndpoint;
 
     private String status;
 
-    @JsonAlias({"client_endpoint", "clientEndpoint"})
+    @JsonProperty("client_endpoint")
     private String clientEndpoint;
 
-    @JsonAlias({"member_id", "memberId"})
+    @JsonProperty("member_id")
     private String memberId;
 
-    @JsonAlias({"user_id", "userId"})
-    private String userId;
+    @ToString.Exclude
+    @JsonProperty("refresh_token")
+    private String refreshToken;
 
     @ToString.Exclude
-    @JsonAlias({"refresh_token", "refreshToken"})
-    private String refreshToken;
+    @JsonProperty("application_token")
+    private String applicationToken;
 }

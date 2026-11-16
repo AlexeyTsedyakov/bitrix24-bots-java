@@ -1,10 +1,7 @@
 package io.github.bitrix24.bots.sdk.dispatcher;
 
 import io.github.bitrix24.bots.api.json.BitrixJsonMapper;
-import io.github.bitrix24.bots.api.model.event.AuthInfo;
-import io.github.bitrix24.bots.api.model.event.Event;
-import io.github.bitrix24.bots.api.model.event.EventData;
-import io.github.bitrix24.bots.api.model.event.EventType;
+import io.github.bitrix24.bots.api.model.event.*;
 import io.github.bitrix24.bots.sdk.config.BotConfig;
 import io.github.bitrix24.bots.sdk.config.WebhookConfig;
 import io.github.bitrix24.bots.sdk.listener.BotEventListener;
@@ -251,7 +248,7 @@ public class BotEventDispatcher {
         JsonNode authNode = root.get("auth");
         if (authNode != null && !authNode.isNull() && !authNode.isMissingNode()) {
             try {
-                AuthInfo topAuth = objectMapper.treeToValue(authNode, AuthInfo.class);
+                Auth topAuth = objectMapper.treeToValue(authNode, Auth.class);
                 if (data == null) {
                     data = EventData.builder().auth(topAuth).build();
                 } else if (data.getAuth() == null) {

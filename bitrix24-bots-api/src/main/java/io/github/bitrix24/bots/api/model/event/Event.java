@@ -184,9 +184,9 @@ public class Event {
     /**
      * Returns authentication information associated with this event.
      *
-     * @return AuthInfo or null
+     * @return Auth or null
      */
-    public AuthInfo getAuth() {
+    public Auth getAuth() {
         if (data == null) {
             return null;
         }

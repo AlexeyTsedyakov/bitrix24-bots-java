@@ -29,7 +29,7 @@ public class EventData {
     private Chat chat;
     private User user;
     private Command command;
-    private AuthInfo auth;
+    private Auth auth;
 
     @JsonAlias({"dialog_id", "dialogId"})
     private String dialogId;
