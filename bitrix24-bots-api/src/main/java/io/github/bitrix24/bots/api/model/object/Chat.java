@@ -1,4 +1,4 @@
-package io.github.bitrix24.bots.api.model.event;
+package io.github.bitrix24.bots.api.model.object;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,7 +13,7 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * Chat details provided in Bitrix24 bot events.
+ * Chat details provided in Bitrix24 bot events and {@code imbot.v2} / {@code im.v2} responses.
  */
 @Data
 @Builder
@@ -21,7 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 @Jacksonized
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ChatInfo {
+public class Chat {
 
     private Long id;
     private String dialogId;
@@ -47,10 +47,12 @@ public class ChatInfo {
     private Long parentChatId;
     private Long parentMessageId;
     private Boolean isNew;
-    private String textFieldEnabled;
+    private Boolean textFieldEnabled;
     private String backgroundId;
+    private Boolean hasManageCapability;
+    private Boolean canHaveThreads;
 
-    // Additional fields (only in method responses, e.g., imbot.v2.Chat.get)
+    // Additional fields (only in method responses, e.g., imbot.v2.Chat.get, imbot.v2.Chat.add)
     private Instant dateCreate;
     private Long lastMessageId;
     private Long lastId;
@@ -63,4 +65,6 @@ public class ChatInfo {
 
     @JsonProperty("public")
     private JsonNode publicSettings;
+
+    private Integer guestCount;
 }

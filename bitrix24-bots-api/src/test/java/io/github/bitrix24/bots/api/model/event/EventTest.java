@@ -49,7 +49,7 @@ class EventTest {
                 .type(EventType.ONIMBOTV2MESSAGEADD)
                 .date(Instant.parse("2025-01-01T00:00:00Z"))
                 .data(EventData.builder()
-                        .chat(ChatInfo.builder().id(100L).dialogId("chat100").name("My Chat").build())
+                        .chat(Chat.builder().id(100L).dialogId("chat100").name("My Chat").build())
                         .message(Message.builder().id(200L).text("Ping message").build())
                         .user(User.builder().id(300L).name("John Doe").build())
                         .command(Command.builder().id("400").command("/start").params("param1").build())
@@ -353,5 +353,212 @@ class EventTest {
         assertThat(mediaFile.getIsTranscribable()).isTrue();
         assertThat(mediaFile.getIsVideoNote()).isTrue();
         assertThat(mediaFile.getIsVoiceNote()).isFalse();
+    }
+
+    @Test
+    @DisplayName("Tests object.Command deserialization across register/update, list, and event contexts")
+    void testCommandDeserialization() {
+        String registerCommandJson = """
+                {
+                    "id": 78,
+                    "botId": 456,
+                    "command": "/help",
+                    "common": false,
+                    "hidden": false,
+                    "extranetSupport": true
+                }
+                """;
+
+        Command registerCommand = BitrixJsonMapper.fromJson(registerCommandJson, Command.class);
+        assertThat(registerCommand).isNotNull();
+        assertThat(registerCommand.getId()).isEqualTo("78");
+        assertThat(registerCommand.getBotId()).isEqualTo(456L);
+        assertThat(registerCommand.getCommand()).isEqualTo("/help");
+        assertThat(registerCommand.getCommon()).isFalse();
+        assertThat(registerCommand.getHidden()).isFalse();
+        assertThat(registerCommand.getExtranetSupport()).isTrue();
+
+        String listCommandJson = """
+                {
+                    "id": 78,
+                    "botId": 456,
+                    "command": "/help",
+                    "category": "Support Bot",
+                    "common": "N",
+                    "context": "",
+                    "title": "Показать помощь",
+                    "params": "запрос",
+                    "extranet": "Y"
+                }
+                """;
+
+        Command listCommand = BitrixJsonMapper.fromJson(listCommandJson, Command.class);
+        assertThat(listCommand).isNotNull();
+        assertThat(listCommand.getId()).isEqualTo("78");
+        assertThat(listCommand.getBotId()).isEqualTo(456L);
+        assertThat(listCommand.getCommand()).isEqualTo("/help");
+        assertThat(listCommand.getCategory()).isEqualTo("Support Bot");
+        assertThat(listCommand.getCommon()).isFalse();
+        assertThat(listCommand.getContext()).isEmpty();
+        assertThat(listCommand.getTitle()).isEqualTo("Показать помощь");
+        assertThat(listCommand.getParams()).isEqualTo("запрос");
+        assertThat(listCommand.getExtranet()).isTrue();
+
+        String builtInCommandJson = """
+                {
+                    "id": "def0",
+                    "botId": 0,
+                    "command": "/me",
+                    "category": "Bitrix24",
+                    "common": "Y",
+                    "context": "",
+                    "title": "Action",
+                    "params": "text",
+                    "extranet": "Y"
+                }
+                """;
+
+        Command builtInCommand = BitrixJsonMapper.fromJson(builtInCommandJson, Command.class);
+        assertThat(builtInCommand).isNotNull();
+        assertThat(builtInCommand.getId()).isEqualTo("def0");
+        assertThat(builtInCommand.getBotId()).isEqualTo(0L);
+        assertThat(builtInCommand.getCommand()).isEqualTo("/me");
+        assertThat(builtInCommand.getCommon()).isTrue();
+
+        String eventCommandJson = """
+                {
+                    "id": 78,
+                    "command": "/help",
+                    "params": "topic",
+                    "context": "textarea"
+                }
+                """;
+
+        Command eventCommand = BitrixJsonMapper.fromJson(eventCommandJson, Command.class);
+        assertThat(eventCommand).isNotNull();
+        assertThat(eventCommand.getId()).isEqualTo("78");
+        assertThat(eventCommand.getCommand()).isEqualTo("/help");
+        assertThat(eventCommand.getParams()).isEqualTo("topic");
+        assertThat(eventCommand.getContext()).isEqualTo("textarea");
+    }
+
+    @Test
+    @DisplayName("Tests object.Chat deserialization for method responses and webhook events")
+    void testChatDeserialization() {
+        String methodChatJson = """
+                {
+                    "id": 5,
+                    "dialogId": "chat5",
+                    "name": "Support Chat",
+                    "type": "chat",
+                    "messageType": "C",
+                    "owner": 456,
+                    "color": "#4ba984",
+                    "avatar": "",
+                    "description": "Help desk",
+                    "extranet": false,
+                    "role": "owner",
+                    "containsCollaber": false,
+                    "muteList": [456],
+                    "entityType": "LINES",
+                    "entityId": "line1",
+                    "entityData1": "d1",
+                    "entityData2": "d2",
+                    "entityData3": "d3",
+                    "entityLink": {
+                        "type": "LINES",
+                        "url": "/online/1",
+                        "id": "1"
+                    },
+                    "diskFolderId": 42,
+                    "permissions": {
+                        "manageUsersAdd": "member",
+                        "manageSettings": "owner",
+                        "canPost": "member"
+                    },
+                    "parentChatId": 3,
+                    "parentMessageId": 100,
+                    "isNew": false,
+                    "textFieldEnabled": true,
+                    "backgroundId": "azure",
+                    "hasManageCapability": true,
+                    "canHaveThreads": true,
+                    "dateCreate": "2025-01-15T10:00:00+03:00",
+                    "lastMessageId": 789,
+                    "lastId": 789,
+                    "managerList": [456, 1],
+                    "messageCount": 15,
+                    "userCounter": 3,
+                    "unreadId": 0,
+                    "lastMessageViews": {
+                        "messageId": 789,
+                        "firstViewers": [],
+                        "countOfViewers": 0
+                    },
+                    "markedId": 780,
+                    "public": {
+                        "code": "abc",
+                        "link": "https://example.bitrix24.ru/online/abc"
+                    },
+                    "guestCount": 0
+                }
+                """;
+
+        Chat methodChat = BitrixJsonMapper.fromJson(methodChatJson, Chat.class);
+        assertThat(methodChat).isNotNull();
+        assertThat(methodChat.getId()).isEqualTo(5L);
+        assertThat(methodChat.getDialogId()).isEqualTo("chat5");
+        assertThat(methodChat.getName()).isEqualTo("Support Chat");
+        assertThat(methodChat.getType()).isEqualTo("chat");
+        assertThat(methodChat.getMessageType()).isEqualTo("C");
+        assertThat(methodChat.getOwner()).isEqualTo(456L);
+        assertThat(methodChat.getColor()).isEqualTo("#4ba984");
+        assertThat(methodChat.getDescription()).isEqualTo("Help desk");
+        assertThat(methodChat.getExtranet()).isFalse();
+        assertThat(methodChat.getRole()).isEqualTo("owner");
+        assertThat(methodChat.getContainsCollaber()).isFalse();
+        assertThat(methodChat.getMuteList()).containsExactly(456L);
+        assertThat(methodChat.getEntityType()).isEqualTo("LINES");
+        assertThat(methodChat.getEntityLink().get("type").asString()).isEqualTo("LINES");
+        assertThat(methodChat.getDiskFolderId()).isEqualTo(42L);
+        assertThat(methodChat.getPermissions().get("manageSettings").asString()).isEqualTo("owner");
+        assertThat(methodChat.getParentChatId()).isEqualTo(3L);
+        assertThat(methodChat.getParentMessageId()).isEqualTo(100L);
+        assertThat(methodChat.getIsNew()).isFalse();
+        assertThat(methodChat.getTextFieldEnabled()).isTrue();
+        assertThat(methodChat.getBackgroundId()).isEqualTo("azure");
+        assertThat(methodChat.getHasManageCapability()).isTrue();
+        assertThat(methodChat.getCanHaveThreads()).isTrue();
+        assertThat(methodChat.getDateCreate()).isEqualTo(Instant.parse("2025-01-15T07:00:00Z"));
+        assertThat(methodChat.getLastMessageId()).isEqualTo(789L);
+        assertThat(methodChat.getLastId()).isEqualTo(789L);
+        assertThat(methodChat.getManagerList()).containsExactly(456L, 1L);
+        assertThat(methodChat.getMessageCount()).isEqualTo(15);
+        assertThat(methodChat.getUserCounter()).isEqualTo(3);
+        assertThat(methodChat.getUnreadId()).isEqualTo(0L);
+        assertThat(methodChat.getLastMessageViews().get("messageId").asLong()).isEqualTo(789L);
+        assertThat(methodChat.getMarkedId()).isEqualTo(780L);
+        assertThat(methodChat.getPublicSettings().get("code").asString()).isEqualTo("abc");
+        assertThat(methodChat.getGuestCount()).isEqualTo(0);
+
+        String webhookChatJson = """
+                {
+                    "id": "5",
+                    "dialogId": "chat5",
+                    "textFieldEnabled": "1",
+                    "hasManageCapability": "0",
+                    "canHaveThreads": "1",
+                    "public": ""
+                }
+                """;
+
+        Chat webhookChat = BitrixJsonMapper.fromJson(webhookChatJson, Chat.class);
+        assertThat(webhookChat).isNotNull();
+        assertThat(webhookChat.getId()).isEqualTo(5L);
+        assertThat(webhookChat.getTextFieldEnabled()).isTrue();
+        assertThat(webhookChat.getHasManageCapability()).isFalse();
+        assertThat(webhookChat.getCanHaveThreads()).isTrue();
+        assertThat(webhookChat.getPublicSettings().isString()).isTrue();
+        assertThat(webhookChat.getPublicSettings().asString()).isEmpty();
     }
 }
