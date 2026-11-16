@@ -2,6 +2,7 @@ package io.github.bitrix24.bots.api.model.event;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.github.bitrix24.bots.api.model.object.Command;
 import io.github.bitrix24.bots.api.model.object.Message;
 import io.github.bitrix24.bots.api.model.object.User;
 import lombok.AllArgsConstructor;
@@ -26,7 +27,7 @@ public class EventData {
     private Message message;
     private ChatInfo chat;
     private User user;
-    private CommandInfo command;
+    private Command command;
     private AuthInfo auth;
 
     @JsonAlias({"dialog_id", "dialogId"})

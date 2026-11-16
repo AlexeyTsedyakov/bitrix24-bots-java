@@ -52,7 +52,7 @@ class EventTest {
                         .chat(ChatInfo.builder().id(100L).dialogId("chat100").name("My Chat").build())
                         .message(Message.builder().id(200L).text("Ping message").build())
                         .user(User.builder().id(300L).name("John Doe").build())
-                        .command(CommandInfo.builder().id(400L).command("/start").params("param1").build())
+                        .command(Command.builder().id("400").command("/start").params("param1").build())
                         .bot(BotInfo.builder().id(500L).code("bot_code").build())
                         .auth(AuthInfo.builder().applicationToken("tok_123").domain("myportal.ru").build())
                         .build())
@@ -277,5 +277,81 @@ class EventTest {
         assertThat(eventMessage.getViewedByOthers()).isFalse();
         assertThat(eventMessage.getUnread()).isNull();
         assertThat(eventMessage.getViewed()).isNull();
+    }
+
+    @Test
+    @DisplayName("Tests object.File deserialization for document and media files")
+    void testFileDeserialization() {
+        String documentFileJson = """
+                {
+                    "id": 138,
+                    "chatId": 5,
+                    "date": "2025-01-15T10:30:00+03:00",
+                    "type": "file",
+                    "name": "report.pdf",
+                    "extension": "pdf",
+                    "size": 35341,
+                    "duration": null,
+                    "image": false,
+                    "authorId": 1,
+                    "authorName": "John Smith",
+                    "isTranscribable": false,
+                    "isVideoNote": false,
+                    "isVoiceNote": false
+                }
+                """;
+
+        File docFile = BitrixJsonMapper.fromJson(documentFileJson, File.class);
+        assertThat(docFile).isNotNull();
+        assertThat(docFile.getId()).isEqualTo(138L);
+        assertThat(docFile.getChatId()).isEqualTo(5L);
+        assertThat(docFile.getDate()).isEqualTo(Instant.parse("2025-01-15T07:30:00Z"));
+        assertThat(docFile.getType()).isEqualTo("file");
+        assertThat(docFile.getName()).isEqualTo("report.pdf");
+        assertThat(docFile.getExtension()).isEqualTo("pdf");
+        assertThat(docFile.getSize()).isEqualTo(35341L);
+        assertThat(docFile.getDuration()).isNull();
+        assertThat(docFile.getImage()).isNotNull();
+        assertThat(docFile.getImage().isBoolean()).isTrue();
+        assertThat(docFile.getImage().asBoolean()).isFalse();
+        assertThat(docFile.getAuthorId()).isEqualTo(1L);
+        assertThat(docFile.getAuthorName()).isEqualTo("John Smith");
+        assertThat(docFile.getIsTranscribable()).isFalse();
+        assertThat(docFile.getIsVideoNote()).isFalse();
+        assertThat(docFile.getIsVoiceNote()).isFalse();
+
+        String mediaFileJson = """
+                {
+                    "id": 139,
+                    "chatId": 5,
+                    "date": "2025-01-15T10:35:00+03:00",
+                    "type": "video",
+                    "name": "clip.mp4",
+                    "extension": "mp4",
+                    "size": 1024000,
+                    "duration": 42,
+                    "image": {
+                        "height": 600,
+                        "width": 800
+                    },
+                    "authorId": 2,
+                    "authorName": "Jane Doe",
+                    "isTranscribable": true,
+                    "isVideoNote": true,
+                    "isVoiceNote": false
+                }
+                """;
+
+        File mediaFile = BitrixJsonMapper.fromJson(mediaFileJson, File.class);
+        assertThat(mediaFile).isNotNull();
+        assertThat(mediaFile.getId()).isEqualTo(139L);
+        assertThat(mediaFile.getType()).isEqualTo("video");
+        assertThat(mediaFile.getDuration()).isEqualTo(42);
+        assertThat(mediaFile.getImage().isObject()).isTrue();
+        assertThat(mediaFile.getImage().get("height").asInt()).isEqualTo(600);
+        assertThat(mediaFile.getImage().get("width").asInt()).isEqualTo(800);
+        assertThat(mediaFile.getIsTranscribable()).isTrue();
+        assertThat(mediaFile.getIsVideoNote()).isTrue();
+        assertThat(mediaFile.getIsVoiceNote()).isFalse();
     }
 }

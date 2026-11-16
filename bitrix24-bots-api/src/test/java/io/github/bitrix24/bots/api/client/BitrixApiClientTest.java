@@ -307,7 +307,7 @@ class BitrixApiClientTest {
 
         BitrixResponse<CommandRegisterResult> regResp = client.command().register("help", "Help Command");
         assertThat(regResp.isSuccess()).isTrue();
-        assertThat(regResp.getResultOrThrow().getCommand().getId()).isEqualTo(42L);
+        assertThat(regResp.getResultOrThrow().getCommand().getId()).isEqualTo("42");
 
         RecordedRequest req1 = server.takeRequest();
         assertThat(req1.getPath()).isEqualTo("/rest/1/secret_key/imbot.v2.Command.register");

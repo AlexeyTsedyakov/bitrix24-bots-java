@@ -17,6 +17,7 @@ import io.github.bitrix24.bots.api.model.common.batch.BatchRequest;
 import io.github.bitrix24.bots.api.model.common.batch.BatchResult;
 import io.github.bitrix24.bots.api.model.event.Event;
 import io.github.bitrix24.bots.api.model.event.EventGetResult;
+import io.github.bitrix24.bots.api.model.object.Command;
 import io.github.bitrix24.bots.sdk.config.PollingConfig;
 import io.github.bitrix24.bots.sdk.config.WebhookConfig;
 import io.github.bitrix24.bots.sdk.polling.PollingBotRunner;
@@ -63,7 +64,7 @@ class BitrixBotIntegrationTest {
                         .build())
                 .build();
         BitrixResponse<CommandRegisterResult> commandRes = mockClient.command().register(commandReq);
-        Long commandId = commandRes.getResult().getCommand().getId();
+        Long commandId = Long.valueOf(commandRes.getResult().getCommand().getId());
         assertThat(commandId).isEqualTo(888L);
 
         // 3. Assemble BitrixBot facade
@@ -276,7 +277,7 @@ class BitrixBotIntegrationTest {
                 @Override
                 public BitrixResponse<CommandRegisterResult> register(CommandRegisterRequest request) {
                     return BitrixResponse.ok(CommandRegisterResult.builder()
-                            .command(io.github.bitrix24.bots.api.model.command.Command.builder().id(888L).build())
+                            .command(Command.builder().id("888").build())
                             .build());
                 }
                 @Override public BitrixResponse<Boolean> unregister(io.github.bitrix24.bots.api.model.command.CommandUnregisterRequest r) { return BitrixResponse.ok(true); }

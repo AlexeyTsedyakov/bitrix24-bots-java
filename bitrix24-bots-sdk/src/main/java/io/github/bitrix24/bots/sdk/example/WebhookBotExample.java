@@ -93,7 +93,8 @@ public class WebhookBotExample {
         String commandName = event.getCommandName();
         String commandParams = event.getCommandParams();
         Long commandId = event.getData() != null && event.getData().getCommand() != null
-                ? event.getData().getCommand().getId() : null;
+                && event.getData().getCommand().getId() != null
+                ? Long.valueOf(event.getData().getCommand().getId()) : null;
         Long messageId = event.getData() != null && event.getData().getMessage() != null
                 ? event.getData().getMessage().getId() : null;
 
