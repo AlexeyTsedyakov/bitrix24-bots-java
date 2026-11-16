@@ -1,6 +1,7 @@
 package io.github.bitrix24.bots.api.model.bot;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.github.bitrix24.bots.api.model.object.Bot;
 import io.github.bitrix24.bots.api.model.object.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

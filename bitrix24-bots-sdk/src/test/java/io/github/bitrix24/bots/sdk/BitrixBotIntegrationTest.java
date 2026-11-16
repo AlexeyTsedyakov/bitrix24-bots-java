@@ -17,6 +17,7 @@ import io.github.bitrix24.bots.api.model.common.batch.BatchRequest;
 import io.github.bitrix24.bots.api.model.common.batch.BatchResult;
 import io.github.bitrix24.bots.api.model.event.Event;
 import io.github.bitrix24.bots.api.model.event.EventGetResult;
+import io.github.bitrix24.bots.api.model.object.Bot;
 import io.github.bitrix24.bots.api.model.object.Command;
 import io.github.bitrix24.bots.sdk.config.PollingConfig;
 import io.github.bitrix24.bots.sdk.config.WebhookConfig;
@@ -246,7 +247,7 @@ class BitrixBotIntegrationTest {
             return new BotApi() {
                 @Override public BitrixResponse<BotRegisterResult> register(BotRegisterRequest r) {
                     return BitrixResponse.ok(BotRegisterResult.builder()
-                            .bot(io.github.bitrix24.bots.api.model.bot.Bot.builder().id(777L).build())
+                            .bot(Bot.builder().id(777L).build())
                             .build());
                 }
                 @Override public BitrixResponse<io.github.bitrix24.bots.api.model.bot.BotUpdateResult> update(io.github.bitrix24.bots.api.model.bot.BotUpdateRequest r) { return null; }

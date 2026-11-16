@@ -53,8 +53,7 @@ class EventTest {
                         .message(Message.builder().id(200L).text("Ping message").build())
                         .user(User.builder().id(300L).name("John Doe").build())
                         .command(Command.builder().id("400").command("/start").params("param1").build())
-                        .bot(BotInfo.builder().id(500L).code("bot_code").build())
-                        .auth(AuthInfo.builder().applicationToken("tok_123").domain("myportal.ru").build())
+                        .bot(Bot.builder().id(500L).code("bot_code").build())
                         .auth(Auth.builder().applicationToken("tok_123").domain("myportal.ru").build())
                         .build())
                 .build();
@@ -603,5 +602,99 @@ class EventTest {
                 .contains("\"access_token\":\"0b02a0690000071b0008440001b0007a16b39202c2490f015\"")
                 .contains("\"expires_in\":3600")
                 .contains("\"application_token\":\"831c76b092f9f135d9b6b36c3a720757\"");
+    }
+
+    @Test
+    @DisplayName("Tests object.Bot deserialization for extended, brief, and webhook formats")
+    void testBotDeserialization() {
+        String extendedBotJson = """
+                {
+                    "id": 456,
+                    "code": "support_bot",
+                    "type": "bot",
+                    "isHidden": false,
+                    "isSupportOpenline": true,
+                    "isReactionsEnabled": true,
+                    "backgroundId": null,
+                    "language": "ru",
+                    "moduleId": "rest",
+                    "eventMode": "fetch",
+                    "countMessage": 150,
+                    "countCommand": 3,
+                    "countChat": 12,
+                    "countUser": 45
+                }
+                """;
+
+        Bot extendedBot = BitrixJsonMapper.fromJson(extendedBotJson, Bot.class);
+        assertThat(extendedBot).isNotNull();
+        assertThat(extendedBot.getId()).isEqualTo(456L);
+        assertThat(extendedBot.getCode()).isEqualTo("support_bot");
+        assertThat(extendedBot.getType()).isEqualTo("bot");
+        assertThat(extendedBot.getIsHidden()).isFalse();
+        assertThat(extendedBot.getIsSupportOpenline()).isTrue();
+        assertThat(extendedBot.getIsReactionsEnabled()).isTrue();
+        assertThat(extendedBot.getBackgroundId()).isNull();
+        assertThat(extendedBot.getLanguage()).isEqualTo("ru");
+        assertThat(extendedBot.getModuleId()).isEqualTo("rest");
+        assertThat(extendedBot.getEventMode()).isEqualTo("fetch");
+        assertThat(extendedBot.getCountMessage()).isEqualTo(150);
+        assertThat(extendedBot.getCountCommand()).isEqualTo(3);
+        assertThat(extendedBot.getCountChat()).isEqualTo(12);
+        assertThat(extendedBot.getCountUser()).isEqualTo(45);
+        assertThat(extendedBot.getAuth()).isNull();
+
+        String briefBotJson = """
+                {
+                    "id": 457,
+                    "code": "public_bot",
+                    "type": "openline",
+                    "isHidden": true,
+                    "isSupportOpenline": false,
+                    "isReactionsEnabled": false,
+                    "backgroundId": "azure",
+                    "language": "en"
+                }
+                """;
+
+        Bot briefBot = BitrixJsonMapper.fromJson(briefBotJson, Bot.class);
+        assertThat(briefBot).isNotNull();
+        assertThat(briefBot.getId()).isEqualTo(457L);
+        assertThat(briefBot.getCode()).isEqualTo("public_bot");
+        assertThat(briefBot.getType()).isEqualTo("openline");
+        assertThat(briefBot.getIsHidden()).isTrue();
+        assertThat(briefBot.getIsSupportOpenline()).isFalse();
+        assertThat(briefBot.getIsReactionsEnabled()).isFalse();
+        assertThat(briefBot.getBackgroundId()).isEqualTo("azure");
+        assertThat(briefBot.getLanguage()).isEqualTo("en");
+        assertThat(briefBot.getModuleId()).isNull();
+        assertThat(briefBot.getEventMode()).isNull();
+
+        String webhookBotJson = """
+                {
+                    "id": "456",
+                    "code": "support_bot",
+                    "auth": {
+                        "access_token": "tok_bot",
+                        "expires_in": "3600",
+                        "scope": "imbot",
+                        "domain": "some-domain.bitrix24.ru",
+                        "server_endpoint": "https://oauth.bitrix24.tech/rest/",
+                        "status": "F",
+                        "client_endpoint": "https://some-domain.bitrix24.ru/rest/",
+                        "member_id": "bac1cd5c8940947a75e0d71b1a84e348",
+                        "application_token": "app_tok"
+                    }
+                }
+                """;
+
+        Bot webhookBot = BitrixJsonMapper.fromJson(webhookBotJson, Bot.class);
+        assertThat(webhookBot).isNotNull();
+        assertThat(webhookBot.getId()).isEqualTo(456L);
+        assertThat(webhookBot.getCode()).isEqualTo("support_bot");
+        assertThat(webhookBot.getAuth()).isNotNull();
+        assertThat(webhookBot.getAuth().getAccessToken()).isEqualTo("tok_bot");
+        assertThat(webhookBot.getAuth().getExpiresIn()).isEqualTo(3600L);
+        assertThat(webhookBot.getAuth().getApplicationToken()).isEqualTo("app_tok");
     }
 }

@@ -72,7 +72,7 @@ graph TD
 
 ## 📦 Модули проекта
 
-- **`bitrix24-bots-api`**: DTO запросов и ответов REST API, унифицированная доменная модель событий (`Event`, `EventType`, `EventData`, `ChatInfo`, `MessageInfo`, `UserInfo`, `CommandInfo`, `BotInfo`, `AuthInfo`), HTTP-клиент на OkHttp с пулом соединений, сериализатор Jackson с поддержкой snake_case/camelCase, типизированные API-клиенты (`bot()`, `message()`, `command()`, `event()`) и generic-метод `callMethod`.
+- **`bitrix24-bots-api`**: DTO запросов и ответов REST API, унифицированная доменная модель событий, HTTP-клиент на OkHttp с пулом соединений, сериализатор Jackson с поддержкой snake_case/camelCase, типизированные API-клиенты (`bot()`, `message()`, `command()`, `event()`) и generic-метод `callMethod`.
 - **`bitrix24-bots-sdk`**: Диспетчер `BotEventDispatcher`, функциональный слушатель `BotEventListener`, `PollingBotRunner`, `WebhookHandler`, `EmbeddedWebhookServer` и фасадный класс `BitrixBot`.
 
 ---
