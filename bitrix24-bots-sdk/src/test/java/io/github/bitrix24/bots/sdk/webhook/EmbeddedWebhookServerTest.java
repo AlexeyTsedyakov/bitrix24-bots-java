@@ -1,6 +1,6 @@
 package io.github.bitrix24.bots.sdk.webhook;
 
-import io.github.bitrix24.bots.api.model.event.Event;
+import io.github.bitrix24.bots.api.model.method.event.Event;
 import io.github.bitrix24.bots.sdk.config.WebhookConfig;
 import io.github.bitrix24.bots.sdk.dispatcher.BotEventDispatcher;
 import org.junit.jupiter.api.AfterEach;

@@ -1,7 +1,7 @@
 package io.github.bitrix24.bots.api.client;
 
-import io.github.bitrix24.bots.api.model.command.*;
 import io.github.bitrix24.bots.api.model.common.BitrixResponse;
+import io.github.bitrix24.bots.api.model.method.command.*;
 
 /**
  * Client interface for {@code imbot.v2.Command.*} methods.

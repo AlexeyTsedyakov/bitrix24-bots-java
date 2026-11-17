@@ -1,6 +1,6 @@
 package io.github.bitrix24.bots.sdk.config;
 
-import io.github.bitrix24.bots.api.model.event.EventType;
+import io.github.bitrix24.bots.api.model.method.event.EventType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

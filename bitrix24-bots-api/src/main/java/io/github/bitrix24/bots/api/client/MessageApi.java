@@ -1,7 +1,7 @@
 package io.github.bitrix24.bots.api.client;
 
-import io.github.bitrix24.bots.api.model.chat.*;
 import io.github.bitrix24.bots.api.model.common.BitrixResponse;
+import io.github.bitrix24.bots.api.model.method.chat.*;
 
 /**
  * Client interface for {@code imbot.v2.Chat.Message.*} and related chat UI methods.

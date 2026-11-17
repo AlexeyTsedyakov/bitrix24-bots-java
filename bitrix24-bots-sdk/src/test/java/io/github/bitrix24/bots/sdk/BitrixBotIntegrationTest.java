@@ -2,21 +2,16 @@ package io.github.bitrix24.bots.sdk;
 
 import io.github.bitrix24.bots.api.client.*;
 import io.github.bitrix24.bots.api.json.BitrixJsonMapper;
-import io.github.bitrix24.bots.api.model.bot.*;
-import io.github.bitrix24.bots.api.model.chat.SendMessageFields;
-import io.github.bitrix24.bots.api.model.chat.SendMessageRequest;
-import io.github.bitrix24.bots.api.model.chat.SendMessageResult;
-import io.github.bitrix24.bots.api.model.chat.keyboard.Keyboard;
-import io.github.bitrix24.bots.api.model.chat.keyboard.KeyboardButton;
-import io.github.bitrix24.bots.api.model.command.CommandAnswerRequest;
-import io.github.bitrix24.bots.api.model.command.CommandRegisterFields;
-import io.github.bitrix24.bots.api.model.command.CommandRegisterRequest;
-import io.github.bitrix24.bots.api.model.command.CommandRegisterResult;
+import io.github.bitrix24.bots.api.model.method.bot.*;
+import io.github.bitrix24.bots.api.model.method.chat.*;
+import io.github.bitrix24.bots.api.model.method.chat.keyboard.Keyboard;
+import io.github.bitrix24.bots.api.model.method.chat.keyboard.KeyboardButton;
+import io.github.bitrix24.bots.api.model.method.command.*;
 import io.github.bitrix24.bots.api.model.common.BitrixResponse;
 import io.github.bitrix24.bots.api.model.common.batch.BatchRequest;
 import io.github.bitrix24.bots.api.model.common.batch.BatchResult;
-import io.github.bitrix24.bots.api.model.event.Event;
-import io.github.bitrix24.bots.api.model.event.EventGetResult;
+import io.github.bitrix24.bots.api.model.method.event.Event;
+import io.github.bitrix24.bots.api.model.method.event.EventGetResult;
 import io.github.bitrix24.bots.api.model.object.Bot;
 import io.github.bitrix24.bots.api.model.object.Command;
 import io.github.bitrix24.bots.sdk.config.PollingConfig;
@@ -250,9 +245,9 @@ class BitrixBotIntegrationTest {
                             .bot(Bot.builder().id(777L).build())
                             .build());
                 }
-                @Override public BitrixResponse<io.github.bitrix24.bots.api.model.bot.BotUpdateResult> update(io.github.bitrix24.bots.api.model.bot.BotUpdateRequest r) { return null; }
-                @Override public BitrixResponse<io.github.bitrix24.bots.api.model.bot.BotGetResult> get(io.github.bitrix24.bots.api.model.bot.BotGetRequest r) { return null; }
-                @Override public BitrixResponse<io.github.bitrix24.bots.api.model.bot.BotListResult> list(io.github.bitrix24.bots.api.model.bot.BotListRequest r) { return null; }
+                @Override public BitrixResponse<BotUpdateResult> update(BotUpdateRequest r) { return null; }
+                @Override public BitrixResponse<BotGetResult> get(BotGetRequest r) { return null; }
+                @Override public BitrixResponse<BotListResult> list(BotListRequest r) { return null; }
                 @Override public BitrixResponse<BotUnregisterResult> unregister(BotUnregisterRequest r) { return null; }
             };
         }
@@ -265,10 +260,10 @@ class BitrixBotIntegrationTest {
                     recordedSentMessages.add(request);
                     return BitrixResponse.ok(SendMessageResult.builder().id(messageIdGen.incrementAndGet()).build());
                 }
-                @Override public BitrixResponse<Boolean> update(io.github.bitrix24.bots.api.model.chat.UpdateMessageRequest r) { return BitrixResponse.ok(true); }
-                @Override public BitrixResponse<Boolean> delete(io.github.bitrix24.bots.api.model.chat.DeleteMessageRequest r) { return BitrixResponse.ok(true); }
-                @Override public BitrixResponse<io.github.bitrix24.bots.api.model.chat.ReadMessageResult> read(io.github.bitrix24.bots.api.model.chat.ReadMessageRequest r) { return null; }
-                @Override public BitrixResponse<Boolean> sendTyping(io.github.bitrix24.bots.api.model.chat.SendTypingRequest r) { return BitrixResponse.ok(true); }
+                @Override public BitrixResponse<Boolean> update(UpdateMessageRequest r) { return BitrixResponse.ok(true); }
+                @Override public BitrixResponse<Boolean> delete(DeleteMessageRequest r) { return BitrixResponse.ok(true); }
+                @Override public BitrixResponse<ReadMessageResult> read(ReadMessageRequest r) { return null; }
+                @Override public BitrixResponse<Boolean> sendTyping(SendTypingRequest r) { return BitrixResponse.ok(true); }
             };
         }
 
@@ -281,7 +276,7 @@ class BitrixBotIntegrationTest {
                             .command(Command.builder().id("888").build())
                             .build());
                 }
-                @Override public BitrixResponse<Boolean> unregister(io.github.bitrix24.bots.api.model.command.CommandUnregisterRequest r) { return BitrixResponse.ok(true); }
+                @Override public BitrixResponse<Boolean> unregister(CommandUnregisterRequest r) { return BitrixResponse.ok(true); }
                 @Override
                 public BitrixResponse<Boolean> answer(CommandAnswerRequest request) {
                     recordedAnswers.add(request);

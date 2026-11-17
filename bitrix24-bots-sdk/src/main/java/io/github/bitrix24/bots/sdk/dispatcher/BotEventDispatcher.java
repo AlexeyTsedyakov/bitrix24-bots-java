@@ -1,7 +1,10 @@
 package io.github.bitrix24.bots.sdk.dispatcher;
 
 import io.github.bitrix24.bots.api.json.BitrixJsonMapper;
-import io.github.bitrix24.bots.api.model.event.*;
+import io.github.bitrix24.bots.api.model.method.event.Auth;
+import io.github.bitrix24.bots.api.model.method.event.Event;
+import io.github.bitrix24.bots.api.model.method.event.EventData;
+import io.github.bitrix24.bots.api.model.method.event.EventType;
 import io.github.bitrix24.bots.sdk.config.BotConfig;
 import io.github.bitrix24.bots.sdk.config.WebhookConfig;
 import io.github.bitrix24.bots.sdk.listener.BotEventListener;

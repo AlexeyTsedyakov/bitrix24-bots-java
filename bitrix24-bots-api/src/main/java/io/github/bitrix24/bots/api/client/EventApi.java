@@ -1,8 +1,8 @@
 package io.github.bitrix24.bots.api.client;
 
 import io.github.bitrix24.bots.api.model.common.BitrixResponse;
-import io.github.bitrix24.bots.api.model.event.EventGetRequest;
-import io.github.bitrix24.bots.api.model.event.EventGetResult;
+import io.github.bitrix24.bots.api.model.method.event.EventGetRequest;
+import io.github.bitrix24.bots.api.model.method.event.EventGetResult;
 
 /**
  * Client interface for polling event queue via {@code imbot.v2.Event.get}.

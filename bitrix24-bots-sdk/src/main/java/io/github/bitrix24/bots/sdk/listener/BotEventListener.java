@@ -1,6 +1,6 @@
 package io.github.bitrix24.bots.sdk.listener;
 
-import io.github.bitrix24.bots.api.model.event.Event;
+import io.github.bitrix24.bots.api.model.method.event.Event;
 
 /**
  * Functional interface for receiving and processing Bitrix24 bot events.

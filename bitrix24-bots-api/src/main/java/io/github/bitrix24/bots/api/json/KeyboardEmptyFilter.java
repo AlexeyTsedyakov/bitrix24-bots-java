@@ -1,6 +1,6 @@
 package io.github.bitrix24.bots.api.json;
 
-import io.github.bitrix24.bots.api.model.chat.keyboard.Keyboard;
+import io.github.bitrix24.bots.api.model.method.chat.keyboard.Keyboard;
 
 /**
  * Filter for @JsonInclude(CUSTOM): the value is excluded when equals() returns true.

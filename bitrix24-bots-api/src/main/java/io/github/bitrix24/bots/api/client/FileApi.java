@@ -1,7 +1,7 @@
 package io.github.bitrix24.bots.api.client;
 
 import io.github.bitrix24.bots.api.model.common.BitrixResponse;
-import io.github.bitrix24.bots.api.model.file.*;
+import io.github.bitrix24.bots.api.model.method.file.*;
 
 import java.io.IOException;
 import java.nio.file.Path;

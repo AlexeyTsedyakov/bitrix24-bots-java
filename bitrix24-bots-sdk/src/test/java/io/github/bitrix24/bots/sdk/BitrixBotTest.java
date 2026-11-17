@@ -4,7 +4,7 @@ import io.github.bitrix24.bots.api.client.*;
 import io.github.bitrix24.bots.api.model.common.BitrixResponse;
 import io.github.bitrix24.bots.api.model.common.batch.BatchRequest;
 import io.github.bitrix24.bots.api.model.common.batch.BatchResult;
-import io.github.bitrix24.bots.api.model.event.EventGetResult;
+import io.github.bitrix24.bots.api.model.method.event.EventGetResult;
 import io.github.bitrix24.bots.sdk.config.BotConfig;
 import io.github.bitrix24.bots.sdk.config.PollingConfig;
 import io.github.bitrix24.bots.sdk.config.WebhookConfig;
