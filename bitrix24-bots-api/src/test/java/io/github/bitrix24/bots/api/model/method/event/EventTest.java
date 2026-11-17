@@ -726,4 +726,94 @@ class EventTest {
         assertThat(webhookBot.getAuth().getExpiresIn()).isEqualTo(3600L);
         assertThat(webhookBot.getAuth().getApplicationToken()).isEqualTo("app_tok");
     }
+
+    @Test
+    @DisplayName("Tests method.event.EventData deserialization across imbot.v2 and im.v2 event payloads")
+    void testEventDataDeserialization() {
+        String messageReplyDataJson = """
+                {
+                    "bot": {
+                        "id": 456,
+                        "code": "support_bot",
+                        "type": "bot",
+                        "eventMode": "fetch"
+                    },
+                    "message": {
+                        "id": 790,
+                        "chatId": 5,
+                        "authorId": 1,
+                        "text": "Reply text"
+                    },
+                    "chat": {
+                        "id": 5,
+                        "dialogId": "chat5",
+                        "type": "chat"
+                    },
+                    "user": {
+                        "id": 1,
+                        "name": "John Smith"
+                    },
+                    "language": "en",
+                    "additionalMessages": [
+                        {
+                            "id": 789,
+                            "chatId": 5,
+                            "authorId": 456,
+                            "text": "Original message"
+                        }
+                    ]
+                }
+                """;
+
+        EventData messageData = BitrixJsonMapper.fromJson(messageReplyDataJson, EventData.class);
+        assertThat(messageData).isNotNull();
+        assertThat(messageData.getBot().getId()).isEqualTo(456L);
+        assertThat(messageData.getMessage().getId()).isEqualTo(790L);
+        assertThat(messageData.getChat().getDialogId()).isEqualTo("chat5");
+        assertThat(messageData.getUser().getId()).isEqualTo(1L);
+        assertThat(messageData.getLanguage()).isEqualTo("en");
+        assertThat(messageData.getAdditionalMessages()).hasSize(1);
+        assertThat(messageData.getAdditionalMessages().get(0).getId()).isEqualTo(789L);
+        assertThat(messageData.getAdditionalMessages().get(0).getText()).isEqualTo("Original message");
+
+        String contextDataJson = """
+                {
+                    "bot": {"id": 456, "code": "support_bot"},
+                    "dialogId": "chat5",
+                    "context": {"entityId": 164, "entityType": "task", "source": "link"},
+                    "chat": {"id": 5, "dialogId": "chat5"},
+                    "user": {"id": 1, "name": "John Smith"},
+                    "language": "ru"
+                }
+                """;
+
+        EventData contextData = BitrixJsonMapper.fromJson(contextDataJson, EventData.class);
+        assertThat(contextData).isNotNull();
+        assertThat(contextData.getDialogId()).isEqualTo("chat5");
+        assertThat(contextData.getContext()).isNotNull();
+        assertThat(contextData.getContext().get("entityId").asInt()).isEqualTo(164);
+        assertThat(contextData.getContext().get("entityType").asString()).isEqualTo("task");
+        assertThat(contextData.getLanguage()).isEqualTo("ru");
+
+        String deleteAndReactionJson = """
+                {
+                    "bot": {"id": "456", "code": "support_bot"},
+                    "messageId": "789",
+                    "reaction": "like",
+                    "action": "add",
+                    "command": {"id": 78, "command": "/help", "params": "topic", "context": "textarea"},
+                    "language": "en",
+                    "additionalMessages": []
+                }
+                """;
+
+        EventData deleteAndReactionData = BitrixJsonMapper.fromJson(deleteAndReactionJson, EventData.class);
+        assertThat(deleteAndReactionData).isNotNull();
+        assertThat(deleteAndReactionData.getBot().getId()).isEqualTo(456L);
+        assertThat(deleteAndReactionData.getMessageId()).isEqualTo(789L);
+        assertThat(deleteAndReactionData.getReaction()).isEqualTo("like");
+        assertThat(deleteAndReactionData.getAction()).isEqualTo("add");
+        assertThat(deleteAndReactionData.getCommand().getCommand()).isEqualTo("/help");
+        assertThat(deleteAndReactionData.getAdditionalMessages()).isEmpty();
+    }
 }
