@@ -247,26 +247,28 @@ public class BotEventDispatcher {
             }
         }
 
-        // Attach top-level auth info if data doesn't already have one
+        // Extract top-level auth info if present
+        Auth topAuth = null;
         JsonNode authNode = root.get("auth");
         if (authNode != null && !authNode.isNull() && !authNode.isMissingNode()) {
             try {
-                Auth topAuth = objectMapper.treeToValue(authNode, Auth.class);
-                if (data == null) {
-                    data = EventData.builder().auth(topAuth).build();
-                } else if (data.getAuth() == null) {
-                    data.setAuth(topAuth);
-                }
+                topAuth = objectMapper.treeToValue(authNode, Auth.class);
             } catch (JacksonException e) {
                 log.warn("Failed to deserialize top-level auth node: {}", e.getMessage());
             }
         }
+
+        String eventHandlerId = root.hasNonNull("event_handler_id")
+                ? root.get("event_handler_id").asString()
+                : null;
 
         Event event = Event.builder()
                 .eventId(eventId)
                 .type(type)
                 .date(date)
                 .data(data)
+                .eventHandlerId(eventHandlerId)
+                .auth(topAuth)
                 .build();
 
         notifyListeners(event);

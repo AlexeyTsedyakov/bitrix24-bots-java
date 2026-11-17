@@ -54,8 +54,8 @@ class EventTest {
                         .user(User.builder().id(300L).name("John Doe").build())
                         .command(Command.builder().id("400").command("/start").params("param1").build())
                         .bot(Bot.builder().id(500L).code("bot_code").build())
-                        .auth(Auth.builder().applicationToken("tok_123").domain("myportal.ru").build())
                         .build())
+                .auth(Auth.builder().applicationToken("tok_123").domain("myportal.ru").build())
                 .build();
 
         assertThat(event.getEventId()).isEqualTo(12345L);
@@ -815,5 +815,141 @@ class EventTest {
         assertThat(deleteAndReactionData.getAction()).isEqualTo("add");
         assertThat(deleteAndReactionData.getCommand().getCommand()).isEqualTo("/help");
         assertThat(deleteAndReactionData.getAdditionalMessages()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Tests method.event.Event deserialization for polling and webhook formats")
+    void testEventPollingAndWebhookDeserialization() {
+        String pollingEventJson = """
+                {
+                    "eventId": 1001,
+                    "type": "ONIMBOTV2MESSAGEADD",
+                    "date": "2024-10-11T09:58:12+03:00",
+                    "data": {
+                        "bot": {
+                            "id": 456,
+                            "code": "support_bot",
+                            "type": "bot",
+                            "eventMode": "fetch"
+                        },
+                        "message": {
+                            "id": 193,
+                            "chatId": 112,
+                            "authorId": 129,
+                            "text": "Привет!"
+                        },
+                        "chat": {
+                            "id": 112,
+                            "dialogId": "129",
+                            "type": "private"
+                        },
+                        "user": {
+                            "id": 129,
+                            "name": "Мария Иванова"
+                        },
+                        "language": "ru",
+                        "additionalMessages": []
+                    }
+                }
+                """;
+
+        Event pollingEvent = BitrixJsonMapper.fromJson(pollingEventJson, Event.class);
+        assertThat(pollingEvent).isNotNull();
+        assertThat(pollingEvent.getEventId()).isEqualTo(1001L);
+        assertThat(pollingEvent.getType()).isEqualTo(EventType.ONIMBOTV2MESSAGEADD);
+        assertThat(pollingEvent.getDate()).isEqualTo(Instant.parse("2024-10-11T06:58:12Z"));
+        assertThat(pollingEvent.getEventHandlerId()).isNull();
+        assertThat(pollingEvent.getBotId()).isEqualTo(456L);
+        assertThat(pollingEvent.getChatId()).isEqualTo(112L);
+        assertThat(pollingEvent.getDialogId()).isEqualTo("129");
+        assertThat(pollingEvent.getMessageText()).isEqualTo("Привет!");
+
+        String webhookEventJson = """
+                {
+                    "event": "ONIMBOTV2MESSAGEADD",
+                    "event_handler_id": "1379",
+                    "data": {
+                        "bot": {
+                            "id": "253",
+                            "code": "fp_service_manager_bot"
+                        },
+                        "message": {
+                            "id": "161798",
+                            "chatId": "15324",
+                            "authorId": "14",
+                            "date": "2026-11-03T12:53:43+03:00",
+                            "text": "hello world",
+                            "isSystem": "0",
+                            "viewedByOthers": "0"
+                        },
+                        "chat": {
+                            "id": "15324",
+                            "dialogId": "14",
+                            "type": "private",
+                            "extranet": "0",
+                            "textFieldEnabled": "1"
+                        },
+                        "user": {
+                            "id": "14",
+                            "active": "1",
+                            "name": "Иван Иванов",
+                            "departments": ["13", "26"]
+                        },
+                        "language": "ru"
+                    },
+                    "ts": "1793699623",
+                    "auth": {
+                        "domain": "b24.example.ru",
+                        "client_endpoint": "https://b24.example.ru/rest/",
+                        "server_endpoint": "https://oauth.bitrix24.tech/rest/",
+                        "member_id": "aa440860a0004183762656de0dcdc2eb",
+                        "application_token": "top_app_token"
+                    }
+                }
+                """;
+
+        Event webhookEvent = BitrixJsonMapper.fromJson(webhookEventJson, Event.class);
+        assertThat(webhookEvent).isNotNull();
+        assertThat(webhookEvent.getEventId()).isNull();
+        assertThat(webhookEvent.getType()).isEqualTo(EventType.ONIMBOTV2MESSAGEADD);
+        assertThat(webhookEvent.isMessage()).isTrue();
+        assertThat(webhookEvent.getEventHandlerId()).isEqualTo("1379");
+        assertThat(webhookEvent.getDate()).isEqualTo(Instant.ofEpochSecond(1793699623L));
+        assertThat(webhookEvent.getBotId()).isEqualTo(253L);
+        assertThat(webhookEvent.getChatId()).isEqualTo(15324L);
+        assertThat(webhookEvent.getDialogId()).isEqualTo("14");
+        assertThat(webhookEvent.getMessageText()).isEqualTo("hello world");
+        assertThat(webhookEvent.getAuth()).isNotNull();
+        assertThat(webhookEvent.getAuth().getDomain()).isEqualTo("b24.example.ru");
+        assertThat(webhookEvent.getAuth().getClientEndpoint()).isEqualTo("https://b24.example.ru/rest/");
+        assertThat(webhookEvent.getAuth().getServerEndpoint()).isEqualTo("https://oauth.bitrix24.tech/rest/");
+        assertThat(webhookEvent.getAuth().getMemberId()).isEqualTo("aa440860a0004183762656de0dcdc2eb");
+        assertThat(webhookEvent.getAuth().getApplicationToken()).isEqualTo("top_app_token");
+
+        String webhookBotAuthFallbackJson = """
+                {
+                    "event": "ONIMBOTV2DELETE",
+                    "event_handler_id": "1335",
+                    "ts": "1772093963",
+                    "data": {
+                        "bot": {
+                            "id": "456",
+                            "code": "support_bot",
+                            "auth": {
+                                "access_token": "tok_access",
+                                "refresh_token": "tok_refresh",
+                                "application_token": "tok_app"
+                            }
+                        }
+                    }
+                }
+                """;
+
+        Event botAuthFallbackEvent = BitrixJsonMapper.fromJson(webhookBotAuthFallbackJson, Event.class);
+        assertThat(botAuthFallbackEvent).isNotNull();
+        assertThat(botAuthFallbackEvent.isDelete()).isTrue();
+        assertThat(botAuthFallbackEvent.getAuth()).isNotNull();
+        assertThat(botAuthFallbackEvent.getAuth().getAccessToken()).isEqualTo("tok_access");
+        assertThat(botAuthFallbackEvent.getAuth().getApplicationToken()).isEqualTo("tok_app");
     }
 }

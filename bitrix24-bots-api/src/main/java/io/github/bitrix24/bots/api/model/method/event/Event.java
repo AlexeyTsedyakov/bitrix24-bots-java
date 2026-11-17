@@ -2,6 +2,7 @@ package io.github.bitrix24.bots.api.model.method.event;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,7 +12,8 @@ import lombok.extern.jackson.Jacksonized;
 import java.time.Instant;
 
 /**
- * Unified representation of an incoming Bitrix24 bot event (both Polling {@code imbot.v2.Event.get} and Webhook).
+ * Unified representation of an incoming Bitrix24 event
+ * (both Polling {@code imbot.v2.Event.get} / {@code im.v2.Event.get} and Webhook).
  */
 @Data
 @Builder
@@ -23,13 +25,19 @@ public class Event {
 
     private Long eventId;
 
-    @JsonAlias({"type", "event"})
+    @JsonAlias("event")
     private EventType type;
 
-    @JsonAlias({"date", "ts"})
+    @JsonAlias("ts")
     private Instant date;
 
     private EventData data;
+
+    // Webhook-only top-level fields
+    @JsonProperty("event_handler_id")
+    private String eventHandlerId;
+
+    private Auth auth;
 
     /**
      * Checks if this event is an incoming message ({@link EventType#ONIMBOTV2MESSAGEADD}).
@@ -104,7 +112,7 @@ public class Event {
     }
 
     /**
-     * Returns the chat identifier as string, or null if unavailable.
+     * Returns the chat identifier, or null if unavailable.
      *
      * @return chat ID or null
      */
@@ -182,17 +190,15 @@ public class Event {
     }
 
     /**
-     * Returns authentication information associated with this event.
+     * Returns authentication information associated with this event
+     * (top-level webhook {@code auth}, falling back to {@code data.bot.auth}).
      *
      * @return Auth or null
      */
     public Auth getAuth() {
-        if (data == null) {
-            return null;
+        if (auth != null) {
+            return auth;
         }
-        if (data.getAuth() != null) {
-            return data.getAuth();
-        }
-        return data.getBot() != null ? data.getBot().getAuth() : null;
+        return data != null && data.getBot() != null ? data.getBot().getAuth() : null;
     }
 }

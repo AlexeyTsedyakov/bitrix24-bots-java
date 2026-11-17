@@ -34,7 +34,4 @@ public class EventData {
     private JsonNode context;
     private String language;
     private List<Message> additionalMessages;
-
-    // Top-level webhook auth attached by BotEventDispatcher
-    private Auth auth;
 }
