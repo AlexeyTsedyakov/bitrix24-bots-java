@@ -77,6 +77,19 @@ class EventTest {
         assertThat(EventType.fromString("ONIMBOTV2MESSAGEADD")).isEqualTo(EventType.ONIMBOTV2MESSAGEADD);
         assertThat(EventType.fromString("onimbotv2messageadd")).isEqualTo(EventType.ONIMBOTV2MESSAGEADD);
         assertThat(EventType.fromString("OnImBotV2CommandAdd")).isEqualTo(EventType.ONIMBOTV2COMMANDADD);
+        assertThat(EventType.fromString("ONIMBOTV2JOINCHAT")).isEqualTo(EventType.ONIMBOTV2JOINCHAT);
+        assertThat(EventType.fromString("ONIMBOTV2DELETE")).isEqualTo(EventType.ONIMBOTV2DELETE);
+        assertThat(EventType.fromString("ONIMBOTV2MESSAGEUPDATE")).isEqualTo(EventType.ONIMBOTV2MESSAGEUPDATE);
+        assertThat(EventType.fromString("ONIMBOTV2MESSAGEDELETE")).isEqualTo(EventType.ONIMBOTV2MESSAGEDELETE);
+        assertThat(EventType.fromString("ONIMBOTV2REACTIONCHANGE")).isEqualTo(EventType.ONIMBOTV2REACTIONCHANGE);
+        assertThat(EventType.fromString("ONIMBOTV2CONTEXTGET")).isEqualTo(EventType.ONIMBOTV2CONTEXTGET);
+
+        assertThat(EventType.fromString("ONIMV2MESSAGEADD")).isEqualTo(EventType.ONIMV2MESSAGEADD);
+        assertThat(EventType.fromString("onimv2messageupdate")).isEqualTo(EventType.ONIMV2MESSAGEUPDATE);
+        assertThat(EventType.fromString("ONIMV2MESSAGEDELETE")).isEqualTo(EventType.ONIMV2MESSAGEDELETE);
+        assertThat(EventType.fromString("ONIMV2REACTIONCHANGE")).isEqualTo(EventType.ONIMV2REACTIONCHANGE);
+        assertThat(EventType.fromString("ONIMV2JOINCHAT")).isEqualTo(EventType.ONIMV2JOINCHAT);
+
         assertThat(EventType.fromString("UNKNOWN_EVENT")).isEqualTo(EventType.UNKNOWN);
         assertThat(EventType.fromString(null)).isEqualTo(EventType.UNKNOWN);
         assertThat(EventType.fromString("")).isEqualTo(EventType.UNKNOWN);
@@ -98,6 +111,22 @@ class EventTest {
         assertThat(parsed.isMessage()).isTrue();
         assertThat(parsed.getMessageText()).isEqualTo("hello");
         assertThat(parsed.getDialogId()).isEqualTo("chat5");
+
+        String userEventJson = """
+                {
+                    "eventId": 1002,
+                    "type": "ONIMV2MESSAGEADD",
+                    "date": "2025-01-15T10:31:00+03:00",
+                    "data": {
+                        "message": {"id": 5012, "text": "user message"},
+                        "chat": {"id": 5, "dialogId": "chat5"}
+                    }
+                }
+                """;
+        Event userEvent = BitrixJsonMapper.fromJson(userEventJson, Event.class);
+        assertThat(userEvent.getEventId()).isEqualTo(1002L);
+        assertThat(userEvent.getType()).isEqualTo(EventType.ONIMV2MESSAGEADD);
+        assertThat(userEvent.getMessageText()).isEqualTo("user message");
     }
 
     @Test

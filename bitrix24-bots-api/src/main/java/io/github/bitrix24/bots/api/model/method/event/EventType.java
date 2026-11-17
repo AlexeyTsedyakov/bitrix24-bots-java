@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
 
 /**
- * Enumeration of Bitrix24 imbot.v2 bot event types.
+ * Enumeration of Bitrix24 {@code imbot.v2} bot event types ({@code ONIMBOTV2*})
+ * and {@code im.v2} user event types ({@code ONIMV2*}, returned when {@code withUserEvents} is enabled).
  */
 public enum EventType {
 
@@ -47,6 +48,31 @@ public enum EventType {
      * User opened dialogue with bot passing external context data.
      */
     ONIMBOTV2CONTEXTGET,
+
+    /**
+     * User event: new message in a chat where the subscribed user is a participant.
+     */
+    ONIMV2MESSAGEADD,
+
+    /**
+     * User event: message in a chat was updated/edited.
+     */
+    ONIMV2MESSAGEUPDATE,
+
+    /**
+     * User event: message in a chat was deleted.
+     */
+    ONIMV2MESSAGEDELETE,
+
+    /**
+     * User event: reaction to a message was added or removed.
+     */
+    ONIMV2REACTIONCHANGE,
+
+    /**
+     * User event: new participant was added to a chat.
+     */
+    ONIMV2JOINCHAT,
 
     /**
      * Unknown or unrecognized event type.
