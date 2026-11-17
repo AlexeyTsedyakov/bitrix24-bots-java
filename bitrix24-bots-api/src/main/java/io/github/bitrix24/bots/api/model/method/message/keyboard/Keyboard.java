@@ -1,4 +1,4 @@
-package io.github.bitrix24.bots.api.model.method.chat.keyboard;
+package io.github.bitrix24.bots.api.model.method.message.keyboard;
 
 import com.fasterxml.jackson.annotation.*;
 import lombok.AllArgsConstructor;

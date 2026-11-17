@@ -2,10 +2,10 @@ package io.github.bitrix24.bots.sdk.example;
 
 import io.github.bitrix24.bots.api.client.BitrixApiClient;
 import io.github.bitrix24.bots.api.client.BitrixApiConfig;
-import io.github.bitrix24.bots.api.model.method.chat.SendMessageFields;
-import io.github.bitrix24.bots.api.model.method.chat.SendMessageRequest;
-import io.github.bitrix24.bots.api.model.method.chat.keyboard.Keyboard;
-import io.github.bitrix24.bots.api.model.method.chat.keyboard.KeyboardButton;
+import io.github.bitrix24.bots.api.model.method.message.SendMessageFields;
+import io.github.bitrix24.bots.api.model.method.message.SendMessageRequest;
+import io.github.bitrix24.bots.api.model.method.message.keyboard.Keyboard;
+import io.github.bitrix24.bots.api.model.method.message.keyboard.KeyboardButton;
 import io.github.bitrix24.bots.api.model.method.event.Event;
 import io.github.bitrix24.bots.sdk.BitrixBot;
 import io.github.bitrix24.bots.sdk.config.PollingConfig;

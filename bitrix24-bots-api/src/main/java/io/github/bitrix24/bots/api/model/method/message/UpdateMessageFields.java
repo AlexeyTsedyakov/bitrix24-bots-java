@@ -1,10 +1,10 @@
-package io.github.bitrix24.bots.api.model.method.chat;
+package io.github.bitrix24.bots.api.model.method.message;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.bitrix24.bots.api.json.KeyboardUpdateSerializer;
-import io.github.bitrix24.bots.api.model.method.chat.attach.Attach;
-import io.github.bitrix24.bots.api.model.method.chat.keyboard.Keyboard;
+import io.github.bitrix24.bots.api.model.method.message.attach.Attach;
+import io.github.bitrix24.bots.api.model.method.message.keyboard.Keyboard;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

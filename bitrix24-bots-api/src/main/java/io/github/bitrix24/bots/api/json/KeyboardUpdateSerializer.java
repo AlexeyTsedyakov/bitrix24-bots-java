@@ -1,6 +1,6 @@
 package io.github.bitrix24.bots.api.json;
 
-import io.github.bitrix24.bots.api.model.method.chat.keyboard.Keyboard;
+import io.github.bitrix24.bots.api.model.method.message.keyboard.Keyboard;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonGenerator;
 import tools.jackson.databind.BeanProperty;

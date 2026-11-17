@@ -1,4 +1,4 @@
-package io.github.bitrix24.bots.api.model.method.chat.attach;
+package io.github.bitrix24.bots.api.model.method.message.attach;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;

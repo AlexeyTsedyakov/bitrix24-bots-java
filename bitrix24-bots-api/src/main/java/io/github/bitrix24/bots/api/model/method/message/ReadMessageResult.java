@@ -1,4 +1,4 @@
-package io.github.bitrix24.bots.api.model.method.chat;
+package io.github.bitrix24.bots.api.model.method.message;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
