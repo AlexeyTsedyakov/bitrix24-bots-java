@@ -952,4 +952,78 @@ class EventTest {
         assertThat(botAuthFallbackEvent.getAuth().getAccessToken()).isEqualTo("tok_access");
         assertThat(botAuthFallbackEvent.getAuth().getApplicationToken()).isEqualTo("tok_app");
     }
+
+    @Test
+    @DisplayName("Tests method.event.EventGetRequest serialization and botToken masking")
+    void testEventGetRequestSerialization() {
+        EventGetRequest request = EventGetRequest.builder()
+                .botId(456L)
+                .botToken("secret_bot_token")
+                .offset(1000L)
+                .limit(50)
+                .withUserEvents(true)
+                .build();
+
+        assertThat(request.toString()).doesNotContain("secret_bot_token");
+
+        String json = BitrixJsonMapper.toJson(request);
+        assertThat(json)
+                .contains("\"botId\":456")
+                .contains("\"botToken\":\"secret_bot_token\"")
+                .contains("\"offset\":1000")
+                .contains("\"limit\":50")
+                .contains("\"withUserEvents\":true");
+
+        EventGetRequest offsetOnly = EventGetRequest.ofOffset(200L);
+        assertThat(offsetOnly.getOffset()).isEqualTo(200L);
+        assertThat(offsetOnly.getBotId()).isNull();
+    }
+
+    @Test
+    @DisplayName("Tests method.event.EventGetResult deserialization for non-empty and empty responses")
+    void testEventGetResultDeserialization() {
+        String nonEmptyJson = """
+                {
+                    "events": [
+                        {
+                            "eventId": 1001,
+                            "type": "ONIMBOTV2MESSAGEADD",
+                            "date": "2024-10-11T09:58:12+03:00",
+                            "data": {
+                                "message": {"id": 193, "text": "Привет!"},
+                                "chat": {"id": 112, "dialogId": "129", "type": "private"},
+                                "user": {"id": 129, "name": "Мария Иванова"},
+                                "language": "ru",
+                                "additionalMessages": [],
+                                "bot": {"id": 456, "code": "support_bot"}
+                            }
+                        }
+                    ],
+                    "nextOffset": 1002,
+                    "hasMore": true
+                }
+                """;
+
+        EventGetResult result = BitrixJsonMapper.fromJson(nonEmptyJson, EventGetResult.class);
+        assertThat(result).isNotNull();
+        assertThat(result.getEvents()).hasSize(1);
+        assertThat(result.getEvents().get(0).getEventId()).isEqualTo(1001L);
+        assertThat(result.getEvents().get(0).getType()).isEqualTo(EventType.ONIMBOTV2MESSAGEADD);
+        assertThat(result.getNextOffset()).isEqualTo(1002L);
+        assertThat(result.getHasMore()).isTrue();
+
+        String emptyJson = """
+                {
+                    "events": [],
+                    "nextOffset": 1002,
+                    "hasMore": false
+                }
+                """;
+
+        EventGetResult emptyResult = BitrixJsonMapper.fromJson(emptyJson, EventGetResult.class);
+        assertThat(emptyResult).isNotNull();
+        assertThat(emptyResult.getEvents()).isEmpty();
+        assertThat(emptyResult.getNextOffset()).isEqualTo(1002L);
+        assertThat(emptyResult.getHasMore()).isFalse();
+    }
 }
