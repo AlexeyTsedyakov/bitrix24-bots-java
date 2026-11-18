@@ -19,11 +19,9 @@ import lombok.extern.jackson.Jacksonized;
 public class BotProperties {
 
     private String name;
-    private String firstName;
     private String lastName;
     private String workPosition;
     private String color;
-    private String avatar;
     private String gender;
-    private String birthday;
+    private String avatar;
 }
