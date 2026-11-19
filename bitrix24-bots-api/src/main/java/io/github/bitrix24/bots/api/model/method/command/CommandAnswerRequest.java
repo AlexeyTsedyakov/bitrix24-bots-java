@@ -1,6 +1,7 @@
 package io.github.bitrix24.bots.api.model.method.command;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.github.bitrix24.bots.api.model.method.message.keyboard.Keyboard;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,6 +34,16 @@ public class CommandAnswerRequest {
                 .messageId(messageId)
                 .dialogId(dialogId)
                 .fields(CommandAnswerFields.of(answerMessage))
+                .build();
+    }
+
+    public static CommandAnswerRequest of(Long commandId, Long messageId, String dialogId, String answerMessage,
+                                          Keyboard keyboard) {
+        return CommandAnswerRequest.builder()
+                .commandId(commandId)
+                .messageId(messageId)
+                .dialogId(dialogId)
+                .fields(CommandAnswerFields.of(answerMessage, keyboard))
                 .build();
     }
 }
